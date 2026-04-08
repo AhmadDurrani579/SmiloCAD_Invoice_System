@@ -1,29 +1,23 @@
-import os
 from fastapi import FastAPI
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from core.database import engine, Base
+from api.invoices import router as invoice_router
 
-# This will pick up the secret you saved in Hugging Face
-load_dotenv()
+# Create tables in Neon
+Base.metadata.create_all(bind=engine)
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+app = FastAPI(title="SmiloCAD Invoice API")
 
-# Create the SQLAlchemy engine using the modern psycopg driver
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app = FastAPI()
+# Include the routes from the api folder
+app.include_router(invoice_router)
 
-@app.get("/", include_in_schema=False)
-def root():
-    # This automatically moves the user from / to /docs
-    return RedirectResponse(url="/docs")
-
-@app.get("/health")
-def health_check():
-    # This checks if the URL was loaded correctly from the secrets
-    if DATABASE_URL:
-        return {"status": "Database URL is loaded"}
-    return {"status": "Error: DATABASE_URL not found"}
+@app.get("/")
+def home():
+    return {"message": "Welcome to SmiloCAD API"}
