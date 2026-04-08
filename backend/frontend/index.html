@@ -38,6 +38,7 @@
       </div>
 
       <div class="inv-section">
+        <div class="section-title">Details</div>
         <div class="form-grid form-grid-2">
           <div class="form-group">
             <label>Invoice No.</label>
@@ -88,17 +89,25 @@
         <button class="add-row-btn" onclick="Rows.add()">+ Add Row</button>
       </div>
 
-      <div class="inv-section">
-        <div style="max-width:320px; margin-left:auto;">
-          <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">PKR 0</span></div>
+      <div class="inv-section summary">
+        <div class="section-title">Summary</div>
+        <div class="summary-container">
+          <div class="summary-row">
+            <span class="label">Subtotal</span>
+            <span class="value" id="summary-subtotal">PKR 0</span>
+          </div>
           <div class="summary-row received">
-            <span>Received</span>
-            <input class="received-input" type="number" id="received-input" placeholder="0">
+            <span class="label">Received Amount</span>
+            <input type="number" class="received-input" id="received-input" placeholder="0" min="0">
           </div>
-          <div class="summary-row net"><span>Remaining</span><span id="summary-remaining">PKR 0</span></div>
-          <div class="summary-row net" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;">
-            <span style="font-weight:800">Total</span><span id="summary-total" style="font-weight:800">PKR 0</span>
+          <div class="summary-row remaining">
+            <span class="label">Remaining Balance</span>
+            <span class="value" id="summary-remaining">PKR 0</span>
           </div>
+        </div>
+        <div class="total-block">
+          <span class="label">Total Amount</span>
+          <span class="value" id="summary-total">PKR 0</span>
         </div>
       </div>
 

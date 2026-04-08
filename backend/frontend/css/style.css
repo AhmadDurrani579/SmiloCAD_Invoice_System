@@ -260,3 +260,98 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   .inv-header-band { padding: 1.5rem 1.2rem; }
   .action-bar { padding: 1rem 1.2rem; }
 }
+
+
+/* ─── SUMMARY SECTION (NEW DESIGN) ─── */
+.inv-section.summary {
+  padding: 1.4rem 2.5rem;
+  border-bottom: none;
+}
+
+.summary-container {
+  max-width: 380px;
+  margin-left: auto;
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.summary-row .label {
+  color: var(--gray-700);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.summary-row .value {
+  font-weight: 800;
+  color: var(--gray-900);
+  font-size: 1rem;
+}
+
+/* Green styling for Remaining Balance as per screenshot */
+.summary-row.remaining .value {
+  color: var(--green);
+}
+
+.received-input {
+  width: 140px;
+  text-align: right;
+  padding: 8px 12px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.received-input:focus {
+  border-color: var(--blue-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* The dark navy Total Amount block */
+.total-block {
+  background: var(--blue-deep);
+  margin: 10px -2.5rem -1.4rem auto; /* Aligns to right and sticks to bottom/right edges */
+  padding: 20px 2.5rem;
+  width: calc(100% + 5rem); /* Stretches to full card width if desired, or keep as container */
+  max-width: 450px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: var(--radius);
+}
+
+.total-block .label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.total-block .value {
+  color: #fff;
+  font-family: 'Lora', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .total-block {
+        margin-right: -1.2rem;
+        width: calc(100% + 2.4rem);
+        max-width: none;
+        border-radius: 0;
+    }
+}
