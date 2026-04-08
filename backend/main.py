@@ -9,9 +9,8 @@ from api.invoices import router as invoice_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SmiloCAD Invoice API")
-app.mount("/css", StaticFiles(directory="frontend/css"), name="css")
 app.mount("/js", StaticFiles(directory="frontend/js"), name="js")
-
+app.mount("/css", StaticFiles(directory="frontend/css"), name="css")
 
 # 1. Route to serve the index.html
 @app.get("/")
