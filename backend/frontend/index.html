@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmiloCAD Dental Laboratory</title>
+  <title>SmiloCAD Dental Laboratory — Invoice System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
@@ -24,7 +25,7 @@
 
   <div class="app-body" id="page-invoice">
     <div class="inv-card">
-      
+
       <div class="inv-header-band">
         <div>
           <div class="lab-title">SmiloCAD Dental Laboratory</div>
@@ -32,7 +33,7 @@
         </div>
         <div class="inv-badge-block">
           <div class="inv-badge-label">Invoice</div>
-          <div id="display-inv-number" class="inv-number-pill">#NEW</div>
+          <div class="inv-number-pill" id="display-inv-number">#NEW</div>
         </div>
       </div>
 
@@ -47,15 +48,25 @@
             <input type="date" class="form-control" id="inv-date">
           </div>
         </div>
-
-        <div class="form-grid form-grid-3" style="margin-top: 15px;">
-          <input class="form-control" id="doctor-name" placeholder="Dr. Name">
-          <input class="form-control" id="clinic" placeholder="Clinic Name">
-          <input class="form-control" id="patient" placeholder="Patient Name">
+        
+        <div class="form-grid form-grid-3" style="margin-top:15px">
+          <div class="form-group">
+            <label>Doctor Name</label>
+            <input class="form-control" id="doctor-name" placeholder="Dr. Name">
+          </div>
+          <div class="form-group">
+            <label>Clinic Name</label>
+            <input class="form-control" id="clinic" placeholder="Clinic Name">
+          </div>
+          <div class="form-group">
+            <label>Patient Name</label>
+            <input class="form-control" id="patient" placeholder="Patient Name">
+          </div>
         </div>
-        <div class="form-group" style="margin-top: 15px;">
-           <label>Shade</label>
-           <input class="form-control" id="shade" placeholder="e.g. A1, B2">
+
+        <div class="form-group" style="margin-top:15px">
+            <label>Shade</label>
+            <input class="form-control" id="shade" placeholder="e.g. A1, B2">
         </div>
       </div>
 
@@ -69,41 +80,49 @@
               <th>Qty</th>
               <th>Price (PKR)</th>
               <th>Total</th>
-              <th>✕</th>
+              <th class="center">✕</th>
             </tr>
           </thead>
-          <tbody id="rows-body">
-            </tbody>
+          <tbody id="rows-body"></tbody>
         </table>
         <button class="add-row-btn" onclick="Rows.add()">+ Add Row</button>
       </div>
 
       <div class="inv-section">
-        <div style="max-width:300px; margin-left:auto;">
-          <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="summary-subtotal">PKR 0</span>
-          </div>
+        <div style="max-width:320px; margin-left:auto;">
+          <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">PKR 0</span></div>
           <div class="summary-row received">
             <span>Received</span>
-            <input type="number" id="received-input" placeholder="0">
+            <input class="received-input" type="number" id="received-input" placeholder="0">
           </div>
-          <div class="summary-row net">
-            <span>Remaining</span>
-            <span id="summary-remaining">PKR 0</span>
+          <div class="summary-row net"><span>Remaining</span><span id="summary-remaining">PKR 0</span></div>
+          <div class="summary-row net" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;">
+            <span style="font-weight:800">Total</span><span id="summary-total" style="font-weight:800">PKR 0</span>
           </div>
         </div>
       </div>
 
+      <div class="inv-section" style="border-bottom:none">
+        <label style="font-size:0.85rem; font-weight:700; color:#555">Notes</label>
+        <textarea class="form-control" id="notes" rows="2" placeholder="Instructions..."></textarea>
+      </div>
+
       <div class="action-bar">
-        <button class="btn btn-save" onclick="App.save()">💾 Save Invoice</button>
-        <button class="btn btn-new" onclick="App.newInvoice()">📄 New</button>
+        <button class="btn btn-save"  onclick="App.save()">💾 Save</button>
+        <button class="btn btn-pdf"   onclick="App.downloadPDF()">⬇️ PDF</button>
+        <button class="btn btn-print" onclick="App.print()">🖨️ Print</button>
+        <button class="btn btn-excel" onclick="App.exportExcel()">📊 Excel</button>
+        <div class="btn-spacer"></div>
+        <button class="btn btn-new"   onclick="App.newInvoice()">📄 New</button>
+        <button class="btn btn-clear" onclick="App.clear()">🗑️ Clear</button>
       </div>
 
     </div>
   </div>
 
   <div class="app-body" id="page-history" style="display:none">
+    <div class="page-heading"><h2>Invoice History</h2><span class="count-pill" id="history-count">0</span></div>
+    <div class="search-wrap"><input id="search-input" placeholder="Search..." oninput="History.filter()"></div>
     <div class="hist-list" id="hist-list"></div>
   </div>
 
