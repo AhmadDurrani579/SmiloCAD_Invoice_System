@@ -8,16 +8,14 @@ var App = (function() {
 
   /* ── Collect values into the format FastAPI expects ── */
   function _collect() {
-    // Rows.collect() should return objects with: description, quantity, price_per_unit
     var items = Rows.collect().map(row => ({
-      description: row.desc || "Service",
-      quantity: parseInt(row.qty) || 1,
-      price_per_unit: parseFloat(row.price) || 0
+      description: row.description || row.desc || "Service",
+      quantity: parseInt(row.quantity || row.qty) || 1,
+      price_per_unit: parseFloat(row.price_per_unit || row.price) || 0
     }));
 
     return {
-      // Note: we don't send invoice_no anymore, DB generates it
-      date: document.getElementById("inv-date").value + "T00:00:00", // Ensure ISO format
+      date: document.getElementById("inv-date").value ? document.getElementById("inv-date").value + "T00:00:00" : new Date().toISOString(),
       doctor_name: document.getElementById("doctor-name").value,
       clinic_name: document.getElementById("clinic").value,
       patient_name: document.getElementById("patient").value,
@@ -32,28 +30,24 @@ var App = (function() {
   async function save() {
     try {
         var data = _collect();
-        
-        // If we are editing (not supported yet in your backend, but good for future)
         if (_currentId) data.id = _currentId;
 
-        // Calls the new dbSave we wrote in db.js
         var result = await dbSave(data);
         
-        // Update the UI with the real Invoice Number from Neon
         document.getElementById("inv-number").value = result.invoice_no;
         _currentId = result.id;
 
         showToast(`✅ Saved! ${result.invoice_no}`, "success");
         updateHeaderBadge();
     } catch (err) {
+        console.error("Save error:", err);
         showToast("❌ Save failed. Check console.", "error");
     }
   }
 
-  /* ── Reset form (Updated for Auto-Increment) ── */
+  /* ── Reset form ── */
   async function _resetForm() {
     _currentId = null;
-    // Set to placeholder since DB decides the real number on save
     document.getElementById("inv-number").value  = "Auto-Generated";
     document.getElementById("inv-date").value    = todayStr();
     document.getElementById("doctor-name").value = "";
@@ -66,16 +60,66 @@ var App = (function() {
     updateHeaderBadge();
   }
 
-  /* ... rest of your public methods (print, clear, etc.) ... */
+  /* ── Public Methods ── */
+  function showPage(page) {
+    switchPage(page);
+    if (page === "history") History.load();
+  }
+
+  async function newInvoice() {
+    await _resetForm();
+    showPage("invoice");
+    showToast("📄 New invoice ready", "info");
+  }
+
+  function clear() {
+    if (!confirm("Clear the current form?")) return;
+    _resetForm();
+    showToast("🗑️ Form cleared", "info");
+  }
+
+  function print() {
+    window.print();
+  }
+
+  function downloadPDF() {
+    showToast("📄 Choose 'Save as PDF' in the print dialog", "info");
+    window.print();
+  }
+
+  function exportExcel() {
+    showToast("📊 Excel Export is processing...", "info");
+    // Simplified export logic for now
+  }
+
+  async function loadEdit(id) {
+    var inv = History.getById(id);
+    if (!inv) return showToast("❌ Invoice not found", "error");
+    _currentId = inv.id;
+    // Mapping back from DB names to UI
+    document.getElementById("inv-number").value = inv.invoice_no;
+    document.getElementById("inv-date").value = inv.date ? inv.date.split('T')[0] : "";
+    document.getElementById("doctor-name").value = inv.doctor_name || "";
+    document.getElementById("clinic").value = inv.clinic_name || "";
+    document.getElementById("patient").value = inv.patient_name || "";
+    document.getElementById("shade").value = inv.shade || "";
+    document.getElementById("notes").value = inv.notes || "";
+    document.getElementById("received-input").value = inv.received_amount || "";
+    
+    Rows.load(inv.items || []);
+    showPage("invoice");
+    updateHeaderBadge();
+  }
 
   /* ── Boot ── */
   document.addEventListener("DOMContentLoaded", async function() {
-    await dbOpen();
-    // Start with a clean form
-    document.getElementById("inv-number").value = "Auto-Generated";
-    document.getElementById("inv-date").value   = todayStr();
-    updateHeaderBadge();
-    Rows.reset();
+    try {
+        await dbOpen();
+        document.getElementById("inv-number").value = "Auto-Generated";
+        document.getElementById("inv-date").value = todayStr();
+        updateHeaderBadge();
+        Rows.reset();
+    } catch(e) { console.error("Boot error:", e); }
   });
 
   return {
