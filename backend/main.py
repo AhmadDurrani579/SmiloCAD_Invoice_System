@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+from fastapi.responses import RedirectResponse
 
 # This will pick up the secret you saved in Hugging Face
 load_dotenv()
