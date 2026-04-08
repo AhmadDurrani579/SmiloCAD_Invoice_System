@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmiloCAD Dental Laboratory — Invoice System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+  <!-- TOP NAV BAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">🦷</div>
+      <div>
+        <div class="topbar-name">SmiloCAD Dental Laboratory</div>
+        <div class="topbar-sub">Invoice Management System</div>
+      </div>
+    </div>
+    <div class="topbar-tabs">
+      <button class="topbar-tab active" id="tab-invoice" onclick="App.showPage('invoice')">➕ New Invoice</button>
+      <button class="topbar-tab"        id="tab-history" onclick="App.showPage('history')">📋 History</button>
+    </div>
+    <div class="topbar-info">
+      <span>📞 0328-9577771</span>
+      <span class="topbar-dot"></span>
+      <span>Al Anayat Plaza, G11 Markaz Islamabad</span>
+    </div>
+  </div>
+
+  <!-- ═══ INVOICE PAGE ═══ -->
+  <div class="app-body" id="page-invoice">
+    <div class="inv-card">
+
+      <!-- Header Band -->
+      <div class="inv-header-band">
+        <div>
+          <div class="lab-title">SmiloCAD Dental Laboratory</div>
+          <div class="lab-meta">
+            <div class="lab-meta-item">📞 0328-9577771</div>
+            <div class="lab-meta-item">📍 Al Anayat Plaza, G11 Markaz Islamabad</div>
+          </div>
+        </div>
+        <div class="inv-badge-block">
+          <div class="inv-badge-label">Invoice</div>
+          <div class="inv-number-pill" id="display-inv-number">#INV-0001</div>
+          <div><span class="status-badge status-pending" id="display-status">Pending</span></div>
+        </div>
+      </div>
+
+      <!-- Invoice Details -->
+      <div class="inv-section">
+        <div class="section-title">Invoice Details</div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group">
+            <label>Invoice No.</label>
+            <input class="form-control" id="inv-number" placeholder="INV-0001"/>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" class="form-control" id="inv-date"/>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="inv-status">
+              <option>Pending</option>
+              <option>Paid</option>
+              <option>Partial</option>
+              <option>Cancelled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor & Patient -->
+      <div class="inv-section">
+        <div class="section-title">Doctor &amp; Patient Information</div>
+        <div class="form-grid form-grid-2" style="margin-bottom:12px">
+          <div class="form-group">
+            <label>Doctor Name</label>
+            <input class="form-control" id="doctor-name" placeholder="Enter doctor name"/>
+          </div>
+          <div class="form-group">
+            <label>Clinic Name</label>
+            <input class="form-control" id="clinic" placeholder="e.g. Fit Dental Care"/>
+          </div>
+        </div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Patient Name</label>
+            <input class="form-control" id="patient" placeholder="Patient full name"/>
+          </div>
+          <div class="form-group">
+            <label>Shade</label>
+            <input class="form-control" id="shade" placeholder="Enter shade"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services Table -->
+      <div class="inv-section">
+        <div class="section-title">Services / Work Items</div>
+        <div class="table-wrap">
+          <table class="svc-table">
+            <thead>
+              <tr>
+                <th class="center">#</th>
+                <th style="min-width:220px">Description</th>
+                <th style="min-width:90px" class="center">Quantity</th>
+                <th style="min-width:110px" class="right">Price/Unit (PKR)</th>
+                <th style="min-width:120px" class="right">Total (PKR)</th>
+                <th class="center">✕</th>
+              </tr>
+            </thead>
+            <tbody id="rows-body">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" onclick="Rows.add()">+ Add Row</button>
+      </div>
+
+      <!-- Summary -->
+      <div class="inv-section">
+        <div class="section-title">Summary</div>
+        <div style="max-width:380px;margin-left:auto">
+          <div class="summary-row">
+            <span class="label">Subtotal</span>
+            <span class="value" id="summary-subtotal">PKR 0</span>
+          </div>
+          <div class="summary-row received">
+            <span class="label">Received Amount</span>
+            <input class="received-input" type="number" min="0" placeholder="0" id="received-input"/>
+          </div>
+          <div class="summary-row remaining">
+            <span class="label">Remaining Balance</span>
+            <span class="value" id="summary-remaining">PKR 0</span>
+          </div>
+          <div class="summary-row net">
+            <span class="label">Total Amount</span>
+            <span class="value" id="summary-total">PKR 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="inv-section" style="border-bottom:none">
+        <div class="section-title">Notes / Terms</div>
+        <textarea class="form-control" id="notes" rows="2"
+          style="resize:vertical;min-height:60px"
+          placeholder="Payment terms, delivery schedule, special instructions…"></textarea>
+      </div>
+
+      <!-- Footer -->
+      <div class="inv-footer">
+        <div>Thank you for your trust in <strong>SmiloCAD Dental Laboratory</strong></div>
+        <div class="sig-block">
+          <div class="sig-line">Lab Technician: Dt. Sajid</div>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <button class="btn btn-save"  onclick="App.save()">💾 Save</button>
+        <button class="btn btn-pdf"   onclick="App.downloadPDF()">⬇️ Download PDF</button>
+        <button class="btn btn-print" onclick="App.print()">🖨️ Print</button>
+        <button class="btn btn-excel" onclick="App.exportExcel()">📊 Export Excel</button>
+        <div class="btn-spacer"></div>
+        <button class="btn btn-new"   onclick="App.newInvoice()">📄 New Invoice</button>
+        <button class="btn btn-clear" onclick="App.clear()">🗑️ Clear</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ HISTORY PAGE ═══ -->
+  <div class="app-body" id="page-history" style="display:none">
+    <div class="page-heading">
+      <h2>Invoice History</h2>
+      <span class="count-pill" id="history-count">0 invoices</span>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="search-input" placeholder="Search by doctor, clinic, patient, invoice no., or status…"
+        oninput="History.filter()"/>
+    </div>
+    <div class="hist-list" id="hist-list">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- JS Files (load in order) -->
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/rows.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
