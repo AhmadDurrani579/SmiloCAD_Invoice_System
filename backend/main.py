@@ -15,6 +15,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 app = FastAPI()
 
+@app.get("/", include_in_schema=False)
+def root():
+    # This automatically moves the user from / to /docs
+    return RedirectResponse(url="/docs")
+
 @app.get("/health")
 def health_check():
     # This checks if the URL was loaded correctly from the secrets
