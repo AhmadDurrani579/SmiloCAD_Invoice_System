@@ -6,6 +6,7 @@
 function showToast(msg, type) {
   type = type || "success";
   var el = document.getElementById("toast");
+  if (!el) return;
   el.textContent = msg;
   el.className   = "show " + type;
   clearTimeout(el._timer);
@@ -29,31 +30,39 @@ function todayStr() {
 
 /* Show/hide pages */
 function switchPage(page) {
-  document.getElementById("page-invoice").style.display = (page === "invoice") ? "" : "none";
-  document.getElementById("page-history").style.display = (page === "history") ? "" : "none";
+  const invPage = document.getElementById("page-invoice");
+  const histPage = document.getElementById("page-history");
+  const invTab = document.getElementById("tab-invoice");
+  const histTab = document.getElementById("tab-history");
 
-  document.getElementById("tab-invoice").classList.toggle("active", page === "invoice");
-  document.getElementById("tab-history").classList.toggle("active", page === "history");
+  if (invPage) invPage.style.display = (page === "invoice") ? "" : "none";
+  if (histPage) histPage.style.display = (page === "history") ? "" : "none";
+
+  if (invTab) invTab.classList.toggle("active", page === "invoice");
+  if (histTab) histTab.classList.toggle("active", page === "history");
 }
 
-/* Update the live invoice number & status badge */
+/* Update the live invoice number badge in the header */
 function updateHeaderBadge() {
-  var numInput = document.getElementById("inv-number").value;
-  // If the DB hasn't assigned a number yet, show "NEW" in the badge
-  var displayNum = (numInput === "Auto-Generated") ? "NEW" : numInput;
-  
-  var status = document.getElementById("inv-status").value || "Pending";
+  const numInput = document.getElementById("inv-number");
+  const displayPill = document.getElementById("display-inv-number");
 
-  document.getElementById("display-inv-number").textContent = "#" + displayNum;
-
-  var badge = document.getElementById("display-status");
-  badge.textContent = status;
-  badge.className   = "status-badge status-" + status.toLowerCase();
+  if (numInput && displayPill) {
+    const val = numInput.value;
+    // Show "NEW" if it hasn't been saved to Neon yet
+    const displayNum = (val === "Auto-Generated" || !val) ? "NEW" : val;
+    displayPill.textContent = "#" + displayNum;
+  }
 }
 
 /* Wire up listeners */
 document.addEventListener("DOMContentLoaded", function() {
-  // Listen for the DB update when the invoice is saved
-  document.getElementById("inv-number").addEventListener("change", updateHeaderBadge);
-  document.getElementById("inv-status").addEventListener("change", updateHeaderBadge);
+  const invNumEl = document.getElementById("inv-number");
+  
+  // Update badge whenever the invoice number changes (e.g., after saving)
+  if (invNumEl) {
+    invNumEl.addEventListener("change", updateHeaderBadge);
+    // Initial call to set badge to #NEW
+    updateHeaderBadge();
+  }
 });
