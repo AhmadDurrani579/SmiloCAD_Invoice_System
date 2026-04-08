@@ -1,24 +1,21 @@
-# Use a lightweight Python image
 FROM python:3.10-slim
 
-# 1. Setup User (UID 1000 is mandatory for Hugging Face)
+# System dependencies for database/psycopg
+RUN apt-get update && apt-get install -y libpq-dev gcc && rm -rf /var/lib/apt/lists/*
+
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
 
-# 2. Set working directory
 WORKDIR $HOME/app
 
-# 3. Install Requirements
-# Copy requirements first to leverage Docker caching
+# Copy requirements and install
 COPY --chown=user:user requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# 4. Copy the Application Code
-# Note: We copy the 'app' folder into the container
-COPY --chown=user:user ./app ./app
+# Copy all files from backend/ into the container
+COPY --chown=user:user . .
 
-# 5. Startup Command
-# We use 'app.main:app' because the code is inside the 'app' folder
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# IMPORTANT: Changed from app.main:app to main:app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
