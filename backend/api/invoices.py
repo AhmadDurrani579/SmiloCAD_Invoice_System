@@ -62,3 +62,28 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         "invoice_no": new_invoice.invoice_number,
         "status": "success"
     }
+
+
+    @router.get("/{invoice_id}")
+def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
+    # Look for the invoice and include its items
+    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+        
+    return {
+        "invoice_no": invoice.invoice_number,
+        "doctor": invoice.doctor_name,
+        "clinic": invoice.clinic_name,
+        "patient": invoice.patient_name,
+        "total": invoice.total_amount,
+        "items": [
+            {
+                "desc": item.description,
+                "qty": item.quantity,
+                "price": item.price_per_unit,
+                "subtotal": item.total_price
+            } for item in invoice.items
+        ]
+    }
