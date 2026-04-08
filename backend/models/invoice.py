@@ -6,7 +6,7 @@ from core.database import Base
 class Invoice(Base):
     __tablename__ = "invoices"
 
-    # Auto-incrementing ID (this is your sequence)
+    # Auto-incrementing ID
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     
     # User selected date (defaults to now)
@@ -22,14 +22,16 @@ class Invoice(Base):
     
     items = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
 
-@property
+    # This MUST be indented inside the class
+    @property
     def invoice_number(self):
         return f"INV-{self.id:04d}"
     
 
 class InvoiceItem(Base):
     __tablename__ = "invoice_items"
-    id = Column(Integer, primary_key=True, index=True)
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     invoice_id = Column(Integer, ForeignKey("invoices.id"))
     description = Column(String)
     quantity = Column(Integer)
