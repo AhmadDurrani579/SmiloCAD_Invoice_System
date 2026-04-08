@@ -1,68 +1,63 @@
 /* ─────────────────────────────────────────
-   js/db.js  —  IndexedDB database helpers
+   js/db.js  —  Live Neon DB Helpers
    ───────────────────────────────────────── */
 
-const DB_NAME  = "SmiloCAD_DB";
-const DB_STORE = "invoices";
-const DB_VER   = 1;
+const API_URL = "/invoices"; // Relative path since frontend/backend are on same host
 
-let _db = null;   // holds the open IDBDatabase instance
-
-/* Open (or create) the database */
-function dbOpen() {
-  return new Promise(function(resolve, reject) {
-    const request = indexedDB.open(DB_NAME, DB_VER);
-
-    request.onupgradeneeded = function(e) {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(DB_STORE)) {
-        db.createObjectStore(DB_STORE, { keyPath: "id", autoIncrement: true });
-      }
-    };
-
-    request.onsuccess = function(e) {
-      _db = e.target.result;
-      resolve(_db);
-    };
-
-    request.onerror = function(e) {
-      reject(e);
-    };
-  });
+/* No need to "Open" a local DB anymore, but we'll keep the function 
+   so app.js doesn't break. We'll just return true. */
+async function dbOpen() {
+    console.log("Connected to Live API Mode");
+    return true;
 }
 
-/* Save (insert or update) one invoice record */
-function dbSave(data) {
-  return new Promise(function(resolve, reject) {
-    const tx      = _db.transaction(DB_STORE, "readwrite");
-    const store   = tx.objectStore(DB_STORE);
-    const request = data.id ? store.put(data) : store.add(data);
+/* Save one invoice record to Neon */
+async function dbSave(data) {
+    try {
+        const response = await fetch(`${API_URL}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
 
-    request.onsuccess = function(e) { resolve(e.target.result); };
-    request.onerror   = reject;
-  });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Failed to save to Neon");
+        }
+
+        const result = await response.json();
+        // result will contain { "id": X, "invoice_no": "INV-XXXX" }
+        return result; 
+    } catch (error) {
+        console.error("Save Error:", error);
+        throw error;
+    }
 }
 
-/* Load all invoice records */
-function dbAll() {
-  return new Promise(function(resolve, reject) {
-    const request = _db.transaction(DB_STORE, "readonly")
-                       .objectStore(DB_STORE)
-                       .getAll();
-
-    request.onsuccess = function(e) { resolve(e.target.result); };
-    request.onerror   = reject;
-  });
+/* Load all invoice records from Neon */
+async function dbAll() {
+    try {
+        const response = await fetch(`${API_URL}/`);
+        if (!response.ok) throw new Error("Could not fetch history");
+        return await response.json();
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        return []; // Return empty list on error to prevent UI crash
+    }
 }
 
-/* Delete one invoice by id */
-function dbDelete(id) {
-  return new Promise(function(resolve, reject) {
-    const request = _db.transaction(DB_STORE, "readwrite")
-                       .objectStore(DB_STORE)
-                       .delete(id);
-
-    request.onsuccess = resolve;
-    request.onerror   = reject;
-  });
+/* Delete one invoice by id from Neon */
+async function dbDelete(id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error("Could not delete invoice");
+        return true;
+    } catch (error) {
+        console.error("Delete Error:", error);
+        throw error;
+    }
 }

@@ -2,8 +2,7 @@
    js/ui.js  —  UI helpers & shared utils
    ───────────────────────────────────────── */
 
-/* Show a toast notification
-   type: "success" | "error" | "info"        */
+/* Show a toast notification */
 function showToast(msg, type) {
   type = type || "success";
   var el = document.getElementById("toast");
@@ -18,7 +17,7 @@ function fmt(n) {
   return "PKR " + (Number(n) || 0).toLocaleString("en-PK", { minimumFractionDigits: 0 });
 }
 
-/* Format a number with commas (no currency prefix) */
+/* Format a number with commas */
 function fmtNum(n) {
   return (Number(n) || 0).toLocaleString("en-PK");
 }
@@ -28,7 +27,7 @@ function todayStr() {
   return new Date().toISOString().split("T")[0];
 }
 
-/* Show/hide the two main pages and set the active tab */
+/* Show/hide pages */
 function switchPage(page) {
   document.getElementById("page-invoice").style.display = (page === "invoice") ? "" : "none";
   document.getElementById("page-history").style.display = (page === "history") ? "" : "none";
@@ -37,20 +36,24 @@ function switchPage(page) {
   document.getElementById("tab-history").classList.toggle("active", page === "history");
 }
 
-/* Update the live invoice number & status badge in the header band */
+/* Update the live invoice number & status badge */
 function updateHeaderBadge() {
-  var num    = document.getElementById("inv-number").value || "INV-0001";
+  var numInput = document.getElementById("inv-number").value;
+  // If the DB hasn't assigned a number yet, show "NEW" in the badge
+  var displayNum = (numInput === "Auto-Generated") ? "NEW" : numInput;
+  
   var status = document.getElementById("inv-status").value || "Pending";
 
-  document.getElementById("display-inv-number").textContent = "#" + num;
+  document.getElementById("display-inv-number").textContent = "#" + displayNum;
 
   var badge = document.getElementById("display-status");
   badge.textContent = status;
   badge.className   = "status-badge status-" + status.toLowerCase();
 }
 
-/* Wire up live badge updates once DOM is ready */
+/* Wire up listeners */
 document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("inv-number").addEventListener("input",  updateHeaderBadge);
+  // Listen for the DB update when the invoice is saved
+  document.getElementById("inv-number").addEventListener("change", updateHeaderBadge);
   document.getElementById("inv-status").addEventListener("change", updateHeaderBadge);
 });

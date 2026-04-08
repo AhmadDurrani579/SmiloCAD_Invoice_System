@@ -88,3 +88,26 @@ def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
             } for item in invoice.items
         ]
     }
+
+@router.get("/")
+def get_all_invoices(db: Session = Depends(get_db)):
+    invoices = db.query(Invoice).order_by(Invoice.id.desc()).all()
+    # Include the formatted invoice_no in the response
+    return [{
+        "id": inv.id,
+        "invoice_no": inv.invoice_number,
+        "doctor_name": inv.doctor_name,
+        "patient_name": inv.patient_name,
+        "total_amount": inv.total_amount,
+        "date": inv.date
+    } for inv in invoices]
+
+# DELETE an invoice
+@router.delete("/{invoice_id}")
+def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
+    db_invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    if not db_invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    db.delete(db_invoice)
+    db.commit()
+    return {"message": "Deleted successfully"}

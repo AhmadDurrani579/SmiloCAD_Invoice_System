@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────
-   js/history.js  —  Invoice history page
+   js/history.js  —  Live Neon History Page
    ───────────────────────────────────────── */
 
 var History = (function() {
@@ -9,23 +9,24 @@ var History = (function() {
   /* Format PKR */
   function _fmt(n) { return fmt(n); }
 
-  /* Build HTML for a single history card */
+  /* Build HTML for a single history card (Updated for Neon fields) */
   function _buildCard(inv) {
-    var itemCount = (inv.rows || []).filter(function(r) { return r.desc; }).length;
+    // In our live API, we send a flat list. If you haven't added 
+    // an 'item_count' to the API, we'll just show the total amount.
     return [
       '<div class="hist-item">',
-        '<div class="hist-inv-no">' + (inv.invNumber || "—") + '</div>',
+        '<div class="hist-inv-no">' + (inv.invoice_no || "—") + '</div>',
         '<div>',
-          '<div class="hist-client-name">' + (inv.doctor || "Unknown Doctor") + '</div>',
-          '<div class="hist-date">📅 ' + (inv.invDate || "—") + ' &nbsp;·&nbsp; ' + (inv.clinic || "—") + '</div>',
+          '<div class="hist-client-name">' + (inv.doctor_name || "Unknown Doctor") + '</div>',
+          '<div class="hist-date">📅 ' + (inv.date ? inv.date.split('T')[0] : "—") + ' &nbsp;·&nbsp; ' + (inv.clinic_name || "—") + '</div>',
         '</div>',
         '<div>',
-          '<div class="hist-detail">Patient: <span>' + (inv.patient || "—") + '</span></div>',
-          '<div class="hist-detail">Items: <span>' + itemCount + '</span> &nbsp;·&nbsp; Status: <span>' + (inv.status || "—") + '</span></div>',
+          '<div class="hist-detail">Patient: <span>' + (inv.patient_name || "—") + '</span></div>',
+          '<div class="hist-detail">Status: <span style="color:var(--blue)">Live</span></div>',
         '</div>',
         '<div>',
-          '<div class="hist-amount">' + _fmt(inv.subtotal || 0) + '</div>',
-          '<div style="font-size:0.75rem;color:var(--green);text-align:right;margin-top:2px">Rcvd: ' + _fmt(inv.received || 0) + '</div>',
+          '<div class="hist-amount">' + _fmt(inv.total_amount || 0) + '</div>',
+          '<div style="font-size:0.75rem;color:var(--green);text-align:right;margin-top:2px">Rcvd: ' + _fmt(inv.received_amount || 0) + '</div>',
         '</div>',
         '<div class="hist-actions">',
           '<button class="btn-xs btn-xs-blue" onclick="App.loadEdit(' + inv.id + ')">✏️ Load</button>',
@@ -35,32 +36,16 @@ var History = (function() {
     ].join("");
   }
 
-  /* Render the list — optionally filtered by a search term */
-  function _render(list) {
-    var container = document.getElementById("hist-list");
-    var count     = document.getElementById("history-count");
-
-    count.textContent = list.length + " invoice" + (list.length !== 1 ? "s" : "");
-
-    if (list.length === 0) {
-      var q = document.getElementById("search-input").value;
-      container.innerHTML = [
-        '<div class="empty-state">',
-          '<div class="ico">📋</div>',
-          '<h3>' + (q ? "No matching invoices" : "No invoices yet") + '</h3>',
-          '<p>' + (q ? "Try a different search term." : "Create your first invoice to see it here.") + '</p>',
-        '</div>',
-      ].join("");
-    } else {
-      container.innerHTML = list.map(_buildCard).join("");
-    }
-  }
-
   /* Load all invoices from DB and render */
   function load() {
+    // dbAll() now calls fetch('/invoices/')
     dbAll().then(function(all) {
-      _allInvoices = all.reverse();   // newest first
+      // API already returns newest first if you used .order_by(Invoice.id.desc())
+      _allInvoices = all; 
       filter();
+    }).catch(err => {
+      console.error("Failed to load history:", err);
+      showToast("❌ Could not load history", "error");
     });
   }
 
@@ -70,11 +55,10 @@ var History = (function() {
     var filtered = _allInvoices.filter(function(inv) {
       if (!q) return true;
       return (
-        (inv.invNumber || "").toLowerCase().includes(q) ||
-        (inv.doctor    || "").toLowerCase().includes(q) ||
-        (inv.clinic    || "").toLowerCase().includes(q) ||
-        (inv.patient   || "").toLowerCase().includes(q) ||
-        (inv.status    || "").toLowerCase().includes(q)
+        (inv.invoice_no  || "").toLowerCase().includes(q) ||
+        (inv.doctor_name || "").toLowerCase().includes(q) ||
+        (inv.clinic_name || "").toLowerCase().includes(q) ||
+        (inv.patient_name|| "").toLowerCase().includes(q)
       );
     });
     _render(filtered);
@@ -82,10 +66,12 @@ var History = (function() {
 
   /* Delete an invoice after confirmation */
   function deleteInvoice(id) {
-    if (!confirm("Delete this invoice permanently?")) return;
+    if (!confirm("Delete this invoice permanently from Neon?")) return;
     dbDelete(id).then(function() {
-      showToast("🗑️ Invoice deleted", "error");
+      showToast("🗑️ Invoice deleted", "success");
       load();   // refresh the list
+    }).catch(err => {
+      showToast("❌ Delete failed", "error");
     });
   }
 
@@ -94,7 +80,20 @@ var History = (function() {
     return _allInvoices.find(function(inv) { return inv.id === id; }) || null;
   }
 
-  /* Public API */
+  /* Internal render function (No changes needed) */
+  function _render(list) {
+    var container = document.getElementById("hist-list");
+    var count     = document.getElementById("history-count");
+    count.textContent = list.length + " invoice" + (list.length !== 1 ? "s" : "");
+
+    if (list.length === 0) {
+      var q = document.getElementById("search-input").value;
+      container.innerHTML = '<div class="empty-state"><h3>No invoices found</h3></div>';
+    } else {
+      container.innerHTML = list.map(_buildCard).join("");
+    }
+  }
+
   return { load: load, filter: filter, deleteInvoice: deleteInvoice, getById: getById };
 
 })();
