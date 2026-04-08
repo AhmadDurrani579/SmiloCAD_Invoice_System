@@ -64,7 +64,7 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     }
 
 
-    @router.get("/{invoice_id}")
+@router.get("/{invoice_id}")
 def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
     # Look for the invoice and include its items
     invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
@@ -78,10 +78,11 @@ def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
         "clinic": invoice.clinic_name,
         "patient": invoice.patient_name,
         "total": invoice.total_amount,
+        "date": invoice.date,
         "items": [
             {
-                "desc": item.description,
-                "qty": item.quantity,
+                "description": item.description,
+                "quantity": item.quantity,
                 "price": item.price_per_unit,
                 "subtotal": item.total_price
             } for item in invoice.items
