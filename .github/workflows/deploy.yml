@@ -17,4 +17,4 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           # Sends ONLY the 'backend' folder to HF
-          git push --force https://AhmadDurrani:$HF_TOKEN@huggingface.co/spaces/AhmadDurrani/SmiloCAD_Invoice_System `git subtree split --prefix backend main`:main
+          git push --force https://AhmadDurrani:$HF_TOKEN@huggingface.co/spaces/AhmadYarAI/SmiloCAD_Invoice_System `git subtree split --prefix backend main`:main
