@@ -1,12 +1,17 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from core.database import Base # We will create this next
+from core.database import Base
 
 class Invoice(Base):
     __tablename__ = "invoices"
-    id = Column(Integer, primary_key=True, index=True)
-    invoice_no = Column(String, unique=True, index=True)
+
+    # Auto-incrementing ID (this is your sequence)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    
+    # User selected date (defaults to now)
+    date = Column(DateTime, default=datetime.utcnow)
+    
     doctor_name = Column(String)
     clinic_name = Column(String)
     patient_name = Column(String)
@@ -16,6 +21,11 @@ class Invoice(Base):
     remaining_balance = Column(Float)
     
     items = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
+
+@property
+    def invoice_number(self):
+        return f"INV-{self.id:04d}"
+    
 
 class InvoiceItem(Base):
     __tablename__ = "invoice_items"

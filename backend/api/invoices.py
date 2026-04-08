@@ -1,20 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel
 from core.database import get_db
 from models.invoice import Invoice, InvoiceItem
-from pydantic import BaseModel
-from typing import List
 
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
-# Pydantic Schemas for validation
 class ItemCreate(BaseModel):
     description: str
     quantity: int
     price_per_unit: float
 
 class InvoiceCreate(BaseModel):
-    invoice_no: str
+    date: Optional[datetime] = None # User can select this
     doctor_name: str
     clinic_name: str
     patient_name: str
@@ -24,11 +24,12 @@ class InvoiceCreate(BaseModel):
 
 @router.post("/")
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
-    # Calculate totals
+    # 1. Calculate totals
     total = sum(item.quantity * item.price_per_unit for item in data.items)
     
+    # 2. Create Invoice (ID is generated automatically by Neon)
     new_invoice = Invoice(
-        invoice_no=data.invoice_no,
+        date=data.date or datetime.utcnow(), # Use selected date or 'now'
         doctor_name=data.doctor_name,
         clinic_name=data.clinic_name,
         patient_name=data.patient_name,
@@ -39,8 +40,9 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     )
     
     db.add(new_invoice)
-    db.flush() # Gets the ID without committing yet
+    db.flush() 
 
+    # 3. Add the items
     for item in data.items:
         db_item = InvoiceItem(
             invoice_id=new_invoice.id,
@@ -52,4 +54,11 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         db.add(db_item)
     
     db.commit()
-    return {"status": "success", "invoice_id": new_invoice.id}
+    db.refresh(new_invoice)
+    
+    # Return the real ID and the formatted INV number
+    return {
+        "id": new_invoice.id,
+        "invoice_no": new_invoice.invoice_number,
+        "status": "success"
+    }
