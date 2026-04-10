@@ -237,14 +237,88 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
 #toast.info    { border-left: 4px solid var(--teal); }
 
 /* ─── PRINT ─── */
+.print-sheet { display: none; max-width: 820px; margin: 0 auto; font-family: 'Nunito', sans-serif; color: #222; }
+.print-sheet, .print-sheet * { box-sizing: border-box; }
+.print-header {
+  background: #1e5c78;
+  color: #fff;
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.print-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.print-brand { text-align: right; font-size: 0.75rem; line-height: 1.45; }
+.print-brand-name { font-weight: 700; font-size: 0.8rem; margin-bottom: 2px; }
+.print-info {
+  padding: 18px 26px 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  font-size: 0.76rem;
+}
+.print-info-title { font-weight: 700; margin-bottom: 6px; }
+.print-info-row { display: flex; gap: 8px; margin: 2px 0; }
+.print-info-row .k { width: 120px; font-weight: 600; color: #333; }
+.print-info-row .v { color: #333; }
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  margin: 6px 0 0;
+}
+.print-table thead th {
+  background: #1e5c78;
+  color: #fff;
+  padding: 6px 8px;
+  text-align: left;
+  font-weight: 700;
+}
+.print-table thead th.c { text-align: center; }
+.print-table thead th.r { text-align: right; }
+.print-table tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #d7e1e8;
+}
+.print-table tbody td.c { text-align: center; }
+.print-table tbody td.r { text-align: right; }
+
+.print-summary {
+  padding: 10px 26px 0;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  font-size: 0.75rem;
+}
+.print-terms { color: #333; }
+.print-totals { display: grid; gap: 6px; }
+.tot-row { display: flex; justify-content: space-between; }
+.tot-row.total { border-top: 2px solid #7a2a2a; padding-top: 6px; font-weight: 700; }
+
+.print-footer {
+  margin: 22px 26px 0;
+  background: #1e5c78;
+  color: #fff;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 @media print {
   body { background: #fff !important; }
-  .topbar, .action-bar, .btn-del, .add-row-btn, #toast, #page-history { display: none !important; }
-  #page-invoice { display: block !important; }
+  .topbar, .action-bar, .btn-del, .add-row-btn, #toast, #page-history, #page-invoice { display: none !important; }
   .app-body { padding: 0 !important; max-width: none !important; }
-  .inv-card { box-shadow: none !important; border: 1px solid #ddd; }
-  .inv-header-band, .svc-table thead tr, .summary-row.net { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .tbl-input, .tbl-select, .form-control, .received-input { border: none !important; background: transparent !important; }
+  .print-sheet { display: block; }
+  .print-header, .print-table thead th, .print-footer {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 /* ─── RESPONSIVE ─── */

@@ -84,9 +84,65 @@ var App = (function() {
         if (confirm("Clear form?")) _resetForm();
     }
 
+    function _fmtMoney(n) {
+        return "PKR " + (Number(n) || 0).toLocaleString("en-PK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function _preparePrint() {
+        var invNo = document.getElementById("inv-number")?.value || "INV-0000";
+        var invDate = document.getElementById("inv-date")?.value || "";
+        var doctor = document.getElementById("doctor-name")?.value || "";
+        var clinic = document.getElementById("clinic")?.value || "";
+        var patient = document.getElementById("patient")?.value || "";
+        var shade = document.getElementById("shade")?.value || "";
+
+        var invNoEl = document.getElementById("print-inv-no");
+        var invDateEl = document.getElementById("print-inv-date");
+        if (invNoEl) invNoEl.textContent = invNo === "Auto-Generated" ? "INV-0000" : invNo;
+        if (invDateEl) invDateEl.textContent = invDate || "Enter Date Here";
+
+        var clientEl = document.getElementById("print-client-name");
+        var companyEl = document.getElementById("print-company-name");
+        if (clientEl) clientEl.textContent = doctor || "Client Name";
+        if (companyEl) companyEl.textContent = clinic || "Company Name";
+
+        var rowsEl = document.getElementById("print-rows");
+        if (rowsEl) rowsEl.innerHTML = "";
+
+        var items = (typeof Rows !== 'undefined') ? Rows.collect() : [];
+        var minRows = 8;
+        var rowCount = Math.max(items.length, minRows);
+
+        for (var i = 0; i < rowCount; i++) {
+            var item = items[i];
+            var desc = item ? item.description : "";
+            var qty = item ? item.quantity : "";
+            var price = item ? item.price_per_unit : "";
+            var total = item ? (item.quantity * item.price_per_unit) : "";
+            var rowHtml = [
+                '<tr>',
+                '<td class="c">', (i + 1), '</td>',
+                '<td>', patient || '', '</td>',
+                '<td>', shade || '', '</td>',
+                '<td>', desc || '', '</td>',
+                '<td class="c">', (qty !== "" ? qty : ''), '</td>',
+                '<td class="r">', (price !== "" ? _fmtMoney(price) : ''), '</td>',
+                '<td class="r">', (total !== "" ? _fmtMoney(total) : ''), '</td>',
+                '</tr>'
+            ].join("");
+            if (rowsEl) rowsEl.insertAdjacentHTML("beforeend", rowHtml);
+        }
+
+        var subtotal = (typeof Rows !== 'undefined') ? Rows.subtotal() : 0;
+        var subEl = document.getElementById("print-subtotal");
+        var totalEl = document.getElementById("print-total");
+        if (subEl) subEl.textContent = _fmtMoney(subtotal);
+        if (totalEl) totalEl.textContent = _fmtMoney(subtotal);
+    }
+
     // Empty stubs to prevent "undefined" errors if UI calls them
-    function print() { window.print(); }
-    function downloadPDF() { window.print(); }
+    function print() { _preparePrint(); window.print(); }
+    function downloadPDF() { _preparePrint(); window.print(); }
     function exportExcel() { console.log("Exporting..."); }
     function loadEdit(id) { console.log("Loading ID:", id); }
 
