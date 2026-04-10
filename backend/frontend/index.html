@@ -11,7 +11,7 @@
 
   <div class="topbar">
     <div class="topbar-brand">
-      <div class="topbar-icon">🦷</div>
+      <img class="topbar-logo" src="/img/logo.jpeg" alt="SmiloCAD Dental Lab logo" width="140" height="38">
       <div>
         <div class="topbar-name">SmiloCAD Dental Laboratory</div>
         <div class="topbar-sub">Invoice Management System</div>
@@ -65,9 +65,29 @@
           </div>
         </div>
 
-        <div class="form-group" style="margin-top:15px">
-            <label>Shade</label>
-            <input class="form-control" id="shade" placeholder="e.g. A1, B2">
+        <div class="form-grid form-grid-3" style="margin-top:15px">
+          <div class="form-group">
+              <label>Shade</label>
+              <select class="form-control" id="shade">
+                <option value="">Select shade</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="A3">A3</option>
+                <option value="A3.5">A3.5</option>
+                <option value="A4">A4</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="B3">B3</option>
+                <option value="B4">B4</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="C3">C3</option>
+                <option value="C4">C4</option>
+                <option value="D2">D2</option>
+                <option value="D3">D3</option>
+                <option value="D4">D4</option>
+              </select>
+          </div>
         </div>
       </div>
 
@@ -157,8 +177,8 @@
       </div>
       <div class="print-info-right">
         <div class="print-info-title">Bill To</div>
-        <div class="print-info-row"><span class="k">Client Name</span> <span class="v" id="print-client-name">Client Name</span></div>
-        <div class="print-info-row"><span class="k">Company Name</span> <span class="v" id="print-company-name">Company Name</span></div>
+        <div class="print-info-row"><span class="k">Doctor Name</span> <span class="v" id="print-client-name">Client Name</span></div>
+        <div class="print-info-row"><span class="k">Clinic Name</span> <span class="v" id="print-company-name">Company Name</span></div>
         <div class="print-info-row"><span class="k">Address</span> <span class="v" id="print-address">Address</span></div>
         <div class="print-info-row"><span class="k">Phone</span> <span class="v" id="print-phone">Phone</span></div>
         <div class="print-info-row"><span class="k">Email</span> <span class="v" id="print-email">Email</span></div>

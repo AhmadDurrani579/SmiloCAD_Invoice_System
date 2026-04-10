@@ -10,33 +10,22 @@ const LAB = {
 };
 
 const SERVICES = [
+  "Veneer",
   "Zirconium Crown",
-  "Veneers",
+  "Zirconium Implant",
   "PFM Crown",
-  "PFM Design",
-  "PFM 3D",
-  "Zirconium Bridge + I Bar",
-  "Zirconium Bridge",
-  "Full Zirconium",
-  "E-Max Crown",
-  "E-Max Veneer",
-  "Metal Crown",
-  "Acrylic Crown",
-  "Implant Crown",
-  "Implant Abutment",
-  "Complete Denture",
-  "Partial Denture (RPD)",
-  "Immediate Denture",
+  "PFM Implant",
+  "D-sign Porcelain",
   "Night Guard",
   "Retainer",
-  "Maryland Bridge",
-  "Inlay",
-  "Onlay",
-  "Post & Core",
-  "Study Model",
-  "Occlusal Splint",
-  "Other",
+  "Bleaching Tary",
+  "Soft Denture",
+  "EMAX Veneer",
+  "EMAX Crown",
+  "Zirconium bridge + I bar"
 ];
+// Expose globally so rows.js can always access it
+window.SERVICES = SERVICES;
 
 const DOCTORS = [
   "Dr. Haroon Shah",

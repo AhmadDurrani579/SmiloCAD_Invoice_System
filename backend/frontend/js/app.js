@@ -103,8 +103,8 @@ var App = (function() {
 
         var clientEl = document.getElementById("print-client-name");
         var companyEl = document.getElementById("print-company-name");
-        if (clientEl) clientEl.textContent = doctor || "Client Name";
-        if (companyEl) companyEl.textContent = clinic || "Company Name";
+        if (clientEl) clientEl.textContent = doctor || "Doctor Name";
+        if (companyEl) companyEl.textContent = clinic || "Clinic Name";
 
         var rowsEl = document.getElementById("print-rows");
         if (rowsEl) rowsEl.innerHTML = "";

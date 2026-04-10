@@ -9,8 +9,8 @@ var Rows = (function() {
   /* Build the <select> options HTML */
   function _serviceOptions(selected) {
     var html = '<option value="">— Select Service —</option>';
-    // Ensure SERVICES is defined in your data.js
-    SERVICES.forEach(function(s) {
+    var services = (typeof SERVICES !== "undefined" && SERVICES) ? SERVICES : [];
+    services.forEach(function(s) {
       html += '<option' + (s === selected ? ' selected' : '') + '>' + s + '</option>';
     });
     return html;
