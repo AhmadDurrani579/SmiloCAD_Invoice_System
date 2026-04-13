@@ -30,8 +30,8 @@ var History = (function() {
           '<div style="font-size:0.75rem;color:var(--green);text-align:right;margin-top:2px">Rcvd: ' + _fmt(inv.received_amount || 0) + '</div>',
         '</div>',
         '<div class="hist-actions">',
-          '<button class="btn-xs btn-xs-blue" data-action="load" data-id="' + inv.id + '">✏️ Load</button>',
-          '<button class="btn-xs btn-xs-red"  data-action="delete" data-id="' + inv.id + '">🗑️</button>',
+          '<button class="btn-xs btn-xs-blue" type="button" data-action="load" data-id="' + inv.id + '" onclick="App && App.loadEdit ? App.loadEdit(' + inv.id + ') : null">✏️ Load</button>',
+          '<button class="btn-xs btn-xs-red"  type="button" data-action="delete" data-id="' + inv.id + '" onclick="History && History.deleteInvoice ? History.deleteInvoice(' + inv.id + ') : null">🗑️</button>',
         '</div>',
       '</div>',
     ].join("");
