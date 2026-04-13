@@ -110,20 +110,20 @@ var App = (function() {
         if (rowsEl) rowsEl.innerHTML = "";
 
         var items = (typeof Rows !== 'undefined') ? Rows.collect() : [];
-        var minRows = 8;
-        var rowCount = Math.max(items.length, minRows);
 
-        for (var i = 0; i < rowCount; i++) {
+        for (var i = 0; i < items.length; i++) {
             var item = items[i];
             var desc = item ? item.description : "";
             var qty = item ? item.quantity : "";
             var price = item ? item.price_per_unit : "";
             var total = item ? (item.quantity * item.price_per_unit) : "";
+            var rowPatient = item ? (patient || "") : "";
+            var rowShade = item ? (shade || "") : "";
             var rowHtml = [
                 '<tr>',
                 '<td class="c">', (i + 1), '</td>',
-                '<td>', patient || '', '</td>',
-                '<td>', shade || '', '</td>',
+                '<td>', rowPatient, '</td>',
+                '<td>', rowShade, '</td>',
                 '<td>', desc || '', '</td>',
                 '<td class="c">', (qty !== "" ? qty : ''), '</td>',
                 '<td class="r">', (price !== "" ? _fmtMoney(price) : ''), '</td>',
