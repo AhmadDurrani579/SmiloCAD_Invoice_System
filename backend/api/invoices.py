@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional, List
@@ -73,18 +73,22 @@ def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Invoice not found")
         
     return {
+        "id": invoice.id,
         "invoice_no": invoice.invoice_number,
-        "doctor": invoice.doctor_name,
-        "clinic": invoice.clinic_name,
-        "patient": invoice.patient_name,
-        "total": invoice.total_amount,
         "date": invoice.date,
+        "doctor_name": invoice.doctor_name,
+        "clinic_name": invoice.clinic_name,
+        "patient_name": invoice.patient_name,
+        "shade": invoice.shade,
+        "total_amount": invoice.total_amount,
+        "received_amount": invoice.received_amount,
+        "remaining_balance": invoice.remaining_balance,
         "items": [
             {
                 "description": item.description,
                 "quantity": item.quantity,
-                "price": item.price_per_unit,
-                "subtotal": item.total_price
+                "price_per_unit": item.price_per_unit,
+                "total_price": item.total_price
             } for item in invoice.items
         ]
     }
@@ -97,8 +101,10 @@ def get_all_invoices(db: Session = Depends(get_db)):
         "id": inv.id,
         "invoice_no": inv.invoice_number,
         "doctor_name": inv.doctor_name,
+        "clinic_name": inv.clinic_name,
         "patient_name": inv.patient_name,
         "total_amount": inv.total_amount,
+        "received_amount": inv.received_amount,
         "date": inv.date
     } for inv in invoices]
 

@@ -48,6 +48,25 @@ async function dbAll() {
     }
 }
 
+/* Load one invoice by id from Neon */
+async function dbGet(id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        if (!response.ok) {
+            let detail = "";
+            try {
+                const err = await response.json();
+                detail = err.detail ? ` (${err.detail})` : "";
+            } catch (e) {}
+            throw new Error(`Could not fetch invoice${detail}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Fetch One Error:", error);
+        throw error;
+    }
+}
+
 /* Delete one invoice by id from Neon */
 async function dbDelete(id) {
     try {

@@ -5,6 +5,7 @@
 var History = (function() {
 
   var _allInvoices = [];   // cache of loaded invoices
+  var _boundClicks = false;
 
   /* Format PKR */
   function _fmt(n) { return fmt(n); }
@@ -29,8 +30,8 @@ var History = (function() {
           '<div style="font-size:0.75rem;color:var(--green);text-align:right;margin-top:2px">Rcvd: ' + _fmt(inv.received_amount || 0) + '</div>',
         '</div>',
         '<div class="hist-actions">',
-          '<button class="btn-xs btn-xs-blue" onclick="App.loadEdit(' + inv.id + ')">✏️ Load</button>',
-          '<button class="btn-xs btn-xs-red"  onclick="History.deleteInvoice(' + inv.id + ')">🗑️</button>',
+          '<button class="btn-xs btn-xs-blue" data-action="load" data-id="' + inv.id + '">✏️ Load</button>',
+          '<button class="btn-xs btn-xs-red"  data-action="delete" data-id="' + inv.id + '">🗑️</button>',
         '</div>',
       '</div>',
     ].join("");
@@ -84,6 +85,9 @@ var History = (function() {
   function _render(list) {
     var container = document.getElementById("hist-list");
     var count     = document.getElementById("history-count");
+    if (!container || !count) return;
+
+    _bindClicks();
     count.textContent = list.length + " invoice" + (list.length !== 1 ? "s" : "");
 
     if (list.length === 0) {
@@ -92,6 +96,27 @@ var History = (function() {
     } else {
       container.innerHTML = list.map(_buildCard).join("");
     }
+  }
+
+  function _bindClicks() {
+    if (_boundClicks) return;
+    document.addEventListener("click", function(e) {
+      var btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      var id = parseInt(btn.getAttribute("data-id"), 10);
+      var action = btn.getAttribute("data-action");
+      if (action === "load") {
+        if (typeof showToast === "function") showToast("Loading invoice...", "info");
+        if (typeof App !== "undefined" && typeof App.loadEdit === "function") {
+          App.loadEdit(id);
+        } else if (typeof showToast === "function") {
+          showToast("Load handler missing", "error");
+        }
+      } else if (action === "delete") {
+        deleteInvoice(id);
+      }
+    });
+    _boundClicks = true;
   }
 
   return { load: load, filter: filter, deleteInvoice: deleteInvoice, getById: getById };

@@ -144,7 +144,50 @@ var App = (function() {
     function print() { _preparePrint(); window.print(); }
     function downloadPDF() { _preparePrint(); window.print(); }
     function exportExcel() { console.log("Exporting..."); }
-    function loadEdit(id) { console.log("Loading ID:", id); }
+    async function loadEdit(id) {
+        try {
+            if (!id || isNaN(id)) {
+                if (typeof showToast === 'function') showToast("❌ Invalid invoice id", "error");
+                return;
+            }
+            // Give immediate feedback and switch view
+            if (typeof showPage === "function") showPage("invoice");
+            if (typeof showToast === 'function') showToast("Loading invoice...", "info");
+            if (typeof dbGet !== 'function') throw new Error("dbGet function not found. Check db.js");
+            const inv = await dbGet(id);
+
+            _currentId = inv.id || id;
+            if (document.getElementById("inv-number")) {
+                document.getElementById("inv-number").value = inv.invoice_no || "Auto-Generated";
+            }
+            if (document.getElementById("inv-date")) {
+                const dateStr = inv.date ? String(inv.date).split("T")[0] : "";
+                document.getElementById("inv-date").value = dateStr;
+            }
+
+            const doctorEl = document.getElementById("doctor-name");
+            const clinicEl = document.getElementById("clinic");
+            const patientEl = document.getElementById("patient");
+            const shadeEl = document.getElementById("shade");
+            const receivedEl = document.getElementById("received-input");
+
+            if (doctorEl) doctorEl.value = inv.doctor_name || "";
+            if (clinicEl) clinicEl.value = inv.clinic_name || "";
+            if (patientEl) patientEl.value = inv.patient_name || "";
+            if (shadeEl) shadeEl.value = inv.shade || "";
+            if (receivedEl) receivedEl.value = (inv.received_amount || 0);
+
+            if (typeof Rows !== 'undefined' && typeof Rows.load === 'function') {
+                Rows.load(inv.items || []);
+            }
+
+            if (typeof updateHeaderBadge === 'function') updateHeaderBadge();
+            showPage("invoice");
+        } catch (err) {
+            console.error("Load Error:", err);
+            if (typeof showToast === 'function') showToast("❌ Load failed. Check console.", "error");
+        }
+    }
 
     // ── Boot ──
     document.addEventListener("DOMContentLoaded", async function() {
