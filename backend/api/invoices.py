@@ -45,7 +45,7 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     )
     
     db.add(new_invoice)
-    db.commit() # Click! The dispenser gives you ID 47.
+    db.commit() 
     db.refresh(new_invoice)
 
     # 3. Update the string now that we officially have the ID
