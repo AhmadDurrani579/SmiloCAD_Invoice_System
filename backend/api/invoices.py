@@ -4,13 +4,14 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
 
+# SMART IMPORT for both environments
 try:
-    from backend.models.invoice import Invoice
+    from backend.models.invoice import Invoice, InvoiceItem  # Add InvoiceItem here
     from backend.core.database import get_db
 except ImportError:
-    from models.invoice import Invoice
+    from models.invoice import Invoice, InvoiceItem         # And add it here
     from core.database import get_db
-
+    
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
 class ItemCreate(BaseModel):
