@@ -25,12 +25,10 @@ class InvoiceCreate(BaseModel):
 
 @router.post("/")
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
-    # 1. Calculate totals
     total = sum(item.quantity * item.price_per_unit for item in data.items)
     
-    # 2. Create Invoice (ID is generated automatically by Neon)
     new_invoice = Invoice(
-        date=data.date or datetime.utcnow(), # Use selected date or 'now'
+        date=data.date or datetime.utcnow(),
         doctor_name=data.doctor_name,
         clinic_name=data.clinic_name,
         patient_name=data.patient_name,
@@ -38,33 +36,26 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         total_amount=total,
         received_amount=data.received_amount,
         remaining_balance=total - data.received_amount,
-        notes= data.notes
+        notes=data.notes
     )
     
     db.add(new_invoice)
-    db.flush() 
+    db.flush()  # This assigns the REAL ID from the database
 
-    # 3. Add the items
+    # Set the invoice number directly in Python using the ID we just got
+    new_invoice.invoice_no = f"INV-{new_invoice.id:04d}"
+
+    # Now add items
     for item in data.items:
         db_item = InvoiceItem(
             invoice_id=new_invoice.id,
             description=item.description,
-            quantity=item.quantity,
-            price_per_unit=item.price_per_unit,
-            total_price=item.quantity * item.price_per_unit
+            # ... rest of item code ...
         )
         db.add(db_item)
     
     db.commit()
-    db.refresh(new_invoice)
-    
-    # Return the real ID and the formatted INV number
-    return {
-        "id": new_invoice.id,
-        "invoice_no": new_invoice.invoice_no, # Use the column name 'invoice_no'
-        "status": "success"
-    }
-
+    return {"status": "success", "id": new_invoice.id, "invoice_no": new_invoice.invoice_no}
 
 @router.get("/{invoice_id}")
 def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
