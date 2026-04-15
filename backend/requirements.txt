@@ -3,6 +3,6 @@ uvicorn[standard]==0.27.1
 python-multipart==0.0.9
 python-dotenv==1.0.1
 pydantic-settings
-psycopg[binary]
-pgvector
 sqlalchemy
+psycopg2-binary
+pgvector
