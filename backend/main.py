@@ -4,27 +4,32 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-# FIXED IMPORTS: Added 'backend.' prefix so Vercel can find the modules
-from backend.core.database import engine, Base
-from backend.api.invoices import router as invoice_router
+# --- SMART IMPORT LOGIC ---
+try:
+    # Works on Vercel (Root access)
+    from backend.core.database import engine, Base
+    from backend.api.invoices import router as invoice_router
+except ImportError:
+    # Works on Hugging Face Docker / Local (Internal access)
+    from core.database import engine, Base
+    from api.invoices import router as invoice_router
 
-# Create tables in Neon
+# Initialize Database
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="SmiloCAD Invoice API")
+app = FastAPI(title="SmiloCAD API")
 
-# Path logic for Vercel
+# Setup Pathing
 BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
-# Mount Static Files (Ensure these folders exist inside backend/frontend/)
-app.mount("/js", StaticFiles(directory=BASE_DIR / "frontend" / "js"), name="js")
-app.mount("/css", StaticFiles(directory=BASE_DIR / "frontend" / "css"), name="css")
-app.mount("/img", StaticFiles(directory=BASE_DIR / "frontend" / "img"), name="img")
+# Mount Statics (for Hugging Face directly serving)
+app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
+app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
 
-# Serve the index.html
 @app.get("/")
 async def serve_index():
-    return FileResponse(BASE_DIR / "frontend" / "index.html")
+    return FileResponse(FRONTEND_DIR / "index.html")
 
-# Include the routes - the prefix '/api' is handled by vercel.json
-app.include_router(invoice_router)
+# Include Router with /api prefix so JS can find it on both platforms
+app.include_router(invoice_router, prefix="/api")

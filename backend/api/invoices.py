@@ -3,8 +3,13 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel
-from core.database import get_db
-from models.invoice import Invoice, InvoiceItem
+
+try:
+    from backend.models.invoice import Invoice
+    from backend.core.database import get_db
+except ImportError:
+    from models.invoice import Invoice
+    from core.database import get_db
 
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
