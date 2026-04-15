@@ -2,7 +2,7 @@
    js/db.js  —  Live Neon DB Helpers
    ───────────────────────────────────────── */
 
-const API_URL = "/invoices"; // Relative path since frontend/backend are on same host
+const API_URL = "/api/invoices"; // Relative path since frontend/backend are on same host
 
 /* No need to "Open" a local DB anymore, but we'll keep the function 
    so app.js doesn't break. We'll just return true. */
@@ -14,7 +14,7 @@ async function dbOpen() {
 /* Save one invoice record to Neon */
 async function dbSave(data) {
     try {
-        const response = await fetch(`${API_URL}/`, {
+            const response = await fetch(`${API_URL}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
