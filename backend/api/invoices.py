@@ -26,9 +26,11 @@ class InvoiceCreate(BaseModel):
 
 @router.post("/")
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
+    # 1. Calculate total
     total = sum(item.quantity * item.price_per_unit for item in data.items)
     
-    # 1. Create the invoice WITHOUT an invoice_no yet
+    # 2. Create the invoice object 
+    # Notice: NO db.flush() here!
     new_invoice = Invoice(
         date=data.date or datetime.utcnow(),
         doctor_name=data.doctor_name,
@@ -38,30 +40,29 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         total_amount=total,
         received_amount=data.received_amount,
         remaining_balance=total - data.received_amount,
-        notes=data.notes
+        notes=data.notes,
+        invoice_no="PENDING" # Temporary placeholder
     )
     
     db.add(new_invoice)
-    db.commit()  # <--- SAVE IT NOW. This assigns the ID (e.g., 44)
-    db.refresh(new_invoice) # Now Python knows the ID is 44
+    db.commit() # Click! The dispenser gives you ID 47.
+    db.refresh(new_invoice)
 
-    # 2. Update the string AFTER it is saved
+    # 3. Update the string now that we officially have the ID
     new_invoice.invoice_no = f"INV-{new_invoice.id:04d}"
     
-    # 3. Add the items
+    # 4. Add the items using the confirmed ID
     for item in data.items:
-        db_item = InvoiceItem(
+        db.add(InvoiceItem(
             invoice_id=new_invoice.id,
             description=item.description,
             quantity=item.quantity,
             price_per_unit=item.price_per_unit,
             total_price=item.quantity * item.price_per_unit
-        )
-        db.add(db_item)
+        ))
     
-    db.commit() # Save the string and the items
-    
-    return {"status": "success", "id": new_invoice.id, "invoice_no": new_invoice.invoice_no}
+    db.commit() # Save everything finally
+    return {"status": "success", "invoice_no": new_invoice.invoice_no}
 
 
 @router.get("/{invoice_id}")
