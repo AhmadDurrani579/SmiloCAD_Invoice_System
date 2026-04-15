@@ -19,7 +19,7 @@ class Invoice(Base):
     total_amount = Column(Float)
     received_amount = Column(Float)
     remaining_balance = Column(Float)
-    
+    notes = Column(String, nullable=True)
     items = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
 
     # This MUST be indented inside the class

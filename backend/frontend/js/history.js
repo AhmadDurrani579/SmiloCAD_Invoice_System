@@ -11,9 +11,13 @@ var History = (function() {
   function _fmt(n) { return fmt(n); }
 
   /* Build HTML for a single history card (Updated for Neon fields) */
+/* Build HTML for a single history card (Updated for Neon fields + Notes) */
   function _buildCard(inv) {
-    // In our live API, we send a flat list. If you haven't added 
-    // an 'item_count' to the API, we'll just show the total amount.
+    // Check if there is a note, and create a small snippet for the UI
+    var notePreview = inv.notes 
+      ? '<div class="hist-detail" style="color:var(--amber); font-style:italic;">📝 Note: ' + inv.notes.substring(0, 30) + (inv.notes.length > 30 ? '...' : '') + '</div>'
+      : '';
+
     return [
       '<div class="hist-item">',
         '<div class="hist-inv-no">' + (inv.invoice_no || "—") + '</div>',
@@ -23,20 +27,21 @@ var History = (function() {
         '</div>',
         '<div>',
           '<div class="hist-detail">Patient: <span>' + (inv.patient_name || "—") + '</span></div>',
-          '<div class="hist-detail">Status: <span style="color:var(--blue)">Live</span></div>',
+          // Show the note preview here
+          notePreview, 
         '</div>',
         '<div>',
           '<div class="hist-amount">' + _fmt(inv.total_amount || 0) + '</div>',
           '<div style="font-size:0.75rem;color:var(--green);text-align:right;margin-top:2px">Rcvd: ' + _fmt(inv.received_amount || 0) + '</div>',
         '</div>',
         '<div class="hist-actions">',
-          '<button class="btn-xs btn-xs-blue" type="button" data-action="load" data-id="' + inv.id + '" onclick="App && App.loadEdit ? App.loadEdit(' + inv.id + ') : null">✏️ Load</button>',
-          '<button class="btn-xs btn-xs-red"  type="button" data-action="delete" data-id="' + inv.id + '" onclick="History && History.deleteInvoice ? History.deleteInvoice(' + inv.id + ') : null">🗑️</button>',
+          '<button class="btn-xs btn-xs-blue" type="button" data-action="load" data-id="' + inv.id + '">✏️ Load</button>',
+          '<button class="btn-xs btn-xs-red"  type="button" data-action="delete" data-id="' + inv.id + '">🗑️</button>',
         '</div>',
       '</div>',
     ].join("");
   }
-
+  
   /* Load all invoices from DB and render */
   function load() {
     // dbAll() now calls fetch('/invoices/')

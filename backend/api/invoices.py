@@ -20,6 +20,7 @@ class InvoiceCreate(BaseModel):
     patient_name: str
     shade: str
     received_amount: float
+    notes: Optional[str] = ""
     items: List[ItemCreate]
 
 @router.post("/")
