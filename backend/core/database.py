@@ -6,18 +6,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# 1. Get the URL
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# HF/Neon can drop idle connections; pre_ping + recycle avoids stale connections.
+# 2. FIX: Convert postgres:// to postgresql:// for SQLAlchemy
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# 3. Create the engine
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
     pool_recycle=300,
 )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
