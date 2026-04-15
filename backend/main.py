@@ -1,38 +1,35 @@
 import os
-from pathlib import Path
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
 import sys
 from pathlib import Path
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+# Add the current directory to sys.path
 sys.path.append(str(Path(__file__).parent))
+
 # --- SMART IMPORT LOGIC ---
 try:
     from core.database import engine, Base
     from api.invoices import router as invoice_router
 except ImportError:
-    # Fallback for different environments
     from backend.core.database import engine, Base
     from backend.api.invoices import router as invoice_router
-    
+
 # Initialize Database
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SmiloCAD API")
 
-# Setup Pathing
-BASE_DIR = Path(__file__).resolve().parent
-FRONTEND_DIR = BASE_DIR / "frontend"
+# Add CORS so your frontend can talk to your backend without security blocks
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Mount Statics (for Hugging Face directly serving)
-app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
-app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
+# NOTE: We removed @app.get("/") and app.mount
+# Why? Because vercel.json rewrites handle the frontend files better than Python can.
 
-@app.get("/")
-async def serve_index():
-    return FileResponse(FRONTEND_DIR / "index.html")
-
-# Include Router with /api prefix so JS can find it on both platforms
+# Include Router with /api prefix
 app.include_router(invoice_router, prefix="/api")

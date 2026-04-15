@@ -7,10 +7,21 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "backend/main.py" },
-    { "source": "/js/(.*)", "destination": "backend/frontend/js/$1" },
-    { "source": "/css/(.*)", "destination": "backend/frontend/css/$1" },
-    { "source": "/img/(.*)", "destination": "backend/frontend/img/$1" },
-    { "source": "/(.*)", "destination": "backend/frontend/index.html" }
+    { 
+      "source": "/api/(.*)", 
+      "destination": "backend/main.py" 
+    },
+    { 
+      "source": "/js/(.*)", 
+      "destination": "backend/frontend/js/$1" 
+    },
+    { 
+      "source": "/css/(.*)", 
+      "destination": "backend/frontend/css/$1" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "backend/frontend/index.html" 
+    }
   ]
 }
