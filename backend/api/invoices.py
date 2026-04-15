@@ -20,7 +20,7 @@ class InvoiceCreate(BaseModel):
     patient_name: str
     shade: str
     received_amount: float
-    notes: Optional[str] = ""
+    notes: Optional[str] = None
     items: List[ItemCreate]
 
 @router.post("/")
@@ -37,7 +37,8 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         shade=data.shade,
         total_amount=total,
         received_amount=data.received_amount,
-        remaining_balance=total - data.received_amount
+        remaining_balance=total - data.received_amount,
+        notes= data.notes
     )
     
     db.add(new_invoice)
@@ -60,7 +61,7 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     # Return the real ID and the formatted INV number
     return {
         "id": new_invoice.id,
-        "invoice_no": new_invoice.invoice_number,
+        "invoice_no": new_invoice.invoice_no, # Use the column name 'invoice_no'
         "status": "success"
     }
 
