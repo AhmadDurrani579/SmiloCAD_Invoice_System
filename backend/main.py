@@ -4,16 +4,19 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent))
 # --- SMART IMPORT LOGIC ---
 try:
-    # Works on Vercel (Root access)
-    from backend.core.database import engine, Base
-    from backend.api.invoices import router as invoice_router
-except ImportError:
-    # Works on Hugging Face Docker / Local (Internal access)
     from core.database import engine, Base
     from api.invoices import router as invoice_router
-
+except ImportError:
+    # Fallback for different environments
+    from backend.core.database import engine, Base
+    from backend.api.invoices import router as invoice_router
+    
 # Initialize Database
 Base.metadata.create_all(bind=engine)
 
