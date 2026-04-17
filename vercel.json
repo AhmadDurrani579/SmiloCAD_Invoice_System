@@ -1,9 +1,6 @@
 {
   "version": 2,
   "rewrites": [
-    {
-      "source": "/((?!img|css|js|_pdf_ref).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/(.*)", "destination": "/frontend/index.html" }
   ]
 }
