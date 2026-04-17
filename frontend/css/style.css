@@ -248,6 +248,23 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   align-items: center;
   justify-content: space-between;
 }
+
+.print-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.print-logo {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
 .print-title {
   font-size: 2.1rem;
   font-weight: 800;
@@ -316,7 +333,8 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   .topbar, .action-bar, .btn-del, .add-row-btn, #toast, #page-history, #page-invoice { display: none !important; }
   .app-body { padding: 0 !important; max-width: none !important; }
   .print-sheet { display: block; }
-  .print-header, .print-table thead th, .print-footer {
+  .print-header, .print-table thead th, .print-footer,
+  .print-logo {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
