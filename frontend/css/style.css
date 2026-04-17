@@ -257,7 +257,7 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
 }
 
 .print-logo {
-  width: 120px;
+  width: 200px;
   height: auto;
   object-fit: contain;
   background: #fff;
