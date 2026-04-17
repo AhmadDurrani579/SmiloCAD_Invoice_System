@@ -35,8 +35,7 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     # 1. Calculate total
     total = sum(item.quantity * item.price_per_unit for item in data.items)
     
-    # 2. Create the invoice object 
-    # Notice: NO db.flush() here!
+    # 2. Create the invoice object
     new_invoice = Invoice(
         date=data.date or datetime.utcnow(),
         doctor_name=data.doctor_name,
@@ -47,17 +46,19 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         received_amount=data.received_amount,
         remaining_balance=total - data.received_amount,
         notes=data.notes,
-        invoice_no="PENDING" # Temporary placeholder
+        invoice_no="TEMP" # This will be overwritten before the commit
     )
     
     db.add(new_invoice)
-    db.commit() 
-    db.refresh(new_invoice)
-
-    # 3. Update the string now that we officially have the ID
-    new_invoice.invoice_no = f"INV-{new_invoice.id:04d}"
     
-    # 4. Add the items using the confirmed ID
+    # --- THE SECRET SAUCE ---
+    db.flush()  # This asks the DB for an ID without committing the record
+    
+    # 3. Now we have new_invoice.id, so we set the real invoice_no
+    new_invoice.invoice_no = f"INV-{new_invoice.id:04d}"
+    # ------------------------
+
+    # 4. Add the items
     for item in data.items:
         db.add(InvoiceItem(
             invoice_id=new_invoice.id,
@@ -67,9 +68,13 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
             total_price=item.quantity * item.price_per_unit
         ))
     
-    db.commit() # Save everything finally
-    return {"status": "success", "invoice_no": new_invoice.invoice_no}
-
+    try:
+        db.commit() # Now everything is saved in ONE transaction
+        db.refresh(new_invoice)
+        return {"status": "success", "invoice_no": new_invoice.invoice_no}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
 
 @router.get("/{invoice_id}")
 def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
