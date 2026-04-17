@@ -2,7 +2,7 @@
    js/db.js  —  Live Neon DB Helpers
    ───────────────────────────────────────── */
 
-const API_URL = "https://ahmadyarai-smilocad-invoice-system.hf.space/api/invoices"; // Relative path since frontend/backend are on same host
+const API_URL = "https://ahmadyarai-smilocad-invoice-system.hf.space/api/invoices";
 
 /* No need to "Open" a local DB anymore, but we'll keep the function 
    so app.js doesn't break. We'll just return true. */
@@ -14,7 +14,7 @@ async function dbOpen() {
 /* Save one invoice record to Neon */
 async function dbSave(data) {
     try {
-            const response = await fetch(`${API_URL}`, {
+        const response = await fetch(`${API_URL}/`, {  // ← trailing slash added
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,9 +27,7 @@ async function dbSave(data) {
             throw new Error(error.detail || "Failed to save to Neon");
         }
 
-        const result = await response.json();
-        // result will contain { "id": X, "invoice_no": "INV-XXXX" }
-        return result; 
+        return await response.json();
     } catch (error) {
         console.error("Save Error:", error);
         throw error;
