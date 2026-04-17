@@ -154,10 +154,11 @@
     <div class="hist-list" id="hist-list"></div>
   </div>
 
-  <div id="toast"></div>
+<div id="toast"></div>
 
-  <!-- Print-only invoice layout (matches example PDF style) -->
+  <!-- Print-only invoice layout -->
   <div id="print-sheet" class="print-sheet">
+
     <div class="print-header">
       <div class="print-header-left">
         <img src="img/logo.jpeg" alt="SmiloCAD Logo" class="print-logo">
@@ -169,7 +170,6 @@
         <div class="print-brand-line">Phone: </div>
         <div class="print-brand-line">Email: </div>
       </div>
-    </div>
     </div>
 
     <div class="print-info">
@@ -206,17 +206,15 @@
     <div class="print-summary">
       <div class="print-terms">Terms</div>
       <div class="print-totals">
-        <div class="tot-row"><span>Subtotal</span><span id="print-subtotal">$0.00</span></div>
-        <div class="tot-row"><span>Discount</span><span>$0.00</span></div>
-        <div class="tot-row"><span>Tax Rate</span><span>0%</span></div>
-        <div class="tot-row"><span>Tax</span><span>$0.00</span></div>
-        <div class="tot-row total"><span>Total</span><span id="print-total">$0.00</span></div>
+        <div class="tot-row"><span>Subtotal</span><span id="print-subtotal">PKR 0</span></div>
+        <div class="tot-row"><span>Discount</span><span>PKR 0</span></div>
+        <div class="tot-row total"><span>Total</span><span id="print-total">PKR 0</span></div>
       </div>
     </div>
 
     <div class="print-footer">Thank you for your business!</div>
-  </div>
-  <link rel="stylesheet" href="css/style.css?v=20260413"/>
+
+  </div>  ← print-sheet closes HERE (only once)
 
   <script src="js/data.js?v=20260413"></script>
   <script src="js/db.js?v=20260413"></script>
@@ -224,8 +222,6 @@
   <script src="js/rows.js?v=20260413"></script>
   <script src="js/history.js?v=20260413"></script>
   <script src="js/app.js?v=20260413"></script>
-
-  <!-- Image -->
 
 </body>
 </html>
