@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmiloCAD Dental Laboratory — Invoice System</title>
+  <title>SmiloCAD Dental Laboratory - Invoice System</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/style.css?v=20260413"/>
+  <link rel="stylesheet" href="css/style.css?v=20260418"/>
 </head>
 <body>
 
@@ -18,8 +18,8 @@
       </div>
     </div>
     <div class="topbar-tabs">
-      <button class="topbar-tab active" id="tab-invoice" onclick="App.showPage('invoice')">➕ New Invoice</button>
-      <button class="topbar-tab"        id="tab-history" onclick="App.showPage('history')">📋 History</button>
+      <button class="topbar-tab active" id="tab-invoice" onclick="App.showPage('invoice')">+ New Invoice</button>
+      <button class="topbar-tab" id="tab-history" onclick="App.showPage('history')">History</button>
     </div>
   </div>
 
@@ -29,7 +29,6 @@
       <div class="inv-header-band">
         <div>
           <div class="lab-title">SmiloCAD Dental Laboratory</div>
-          <!-- <div class="lab-meta">📍 Al Anayat Plaza, G11 Markaz Islamabad</div> -->
         </div>
         <div class="inv-badge-block">
           <div class="inv-badge-label">Invoice</div>
@@ -49,8 +48,8 @@
             <input type="date" class="form-control" id="inv-date">
           </div>
         </div>
-        
-        <div class="form-grid form-grid-3" style="margin-top:15px">
+
+        <div class="form-grid form-grid-2" style="margin-top:15px">
           <div class="form-group">
             <label>Doctor Name</label>
             <input class="form-control" id="doctor-name" placeholder="Dr. Name">
@@ -59,53 +58,28 @@
             <label>Clinic Name</label>
             <input class="form-control" id="clinic" placeholder="Clinic Name">
           </div>
-          <div class="form-group">
-            <label>Patient Name</label>
-            <input class="form-control" id="patient" placeholder="Patient Name">
-          </div>
-        </div>
-
-        <div class="form-grid form-grid-3" style="margin-top:15px">
-          <div class="form-group">
-              <label>Shade</label>
-              <select class="form-control" id="shade">
-                <option value="">Select shade</option>
-                <option value="A1">A1</option>
-                <option value="A2">A2</option>
-                <option value="A3">A3</option>
-                <option value="A3.5">A3.5</option>
-                <option value="A4">A4</option>
-                <option value="B1">B1</option>
-                <option value="B2">B2</option>
-                <option value="B3">B3</option>
-                <option value="B4">B4</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
-                <option value="C3">C3</option>
-                <option value="C4">C4</option>
-                <option value="D2">D2</option>
-                <option value="D3">D3</option>
-                <option value="D4">D4</option>
-              </select>
-          </div>
         </div>
       </div>
 
       <div class="inv-section">
         <div class="section-title">Services / Work Items</div>
-        <table class="svc-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Description</th>
-              <th>Qty</th>
-              <th>Price (PKR)</th>
-              <th>Total</th>
-              <th class="center">✕</th>
-            </tr>
-          </thead>
-          <tbody id="rows-body"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="svc-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Patient Name</th>
+                <th>Shade</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Price (PKR)</th>
+                <th>Total</th>
+                <th class="center">x</th>
+              </tr>
+            </thead>
+            <tbody id="rows-body"></tbody>
+          </table>
+        </div>
         <button class="add-row-btn" onclick="Rows.add()">+ Add Row</button>
       </div>
 
@@ -137,13 +111,13 @@
       </div>
 
       <div class="action-bar">
-        <button class="btn btn-save"  onclick="App.save()">💾 Save</button>
-        <button class="btn btn-pdf"   onclick="App.downloadPDF()">⬇️ PDF</button>
-        <button class="btn btn-print" onclick="App.print()">🖨️ Print</button>
-        <button class="btn btn-excel" onclick="App.exportExcel()">📊 Excel</button>
+        <button class="btn btn-save" onclick="App.save()">Save</button>
+        <button class="btn btn-pdf" onclick="App.downloadPDF()">PDF</button>
+        <button class="btn btn-print" onclick="App.print()">Print</button>
+        <button class="btn btn-excel" onclick="App.exportExcel()">Excel</button>
         <div class="btn-spacer"></div>
-        <button class="btn btn-new"   onclick="App.newInvoice()">📄 New</button>
-        <button class="btn btn-clear" onclick="App.clear()">🗑️ Clear</button>
+        <button class="btn btn-new" onclick="App.newInvoice()">New</button>
+        <button class="btn btn-clear" onclick="App.clear()">Clear</button>
       </div>
 
     </div>
@@ -155,11 +129,10 @@
     <div class="hist-list" id="hist-list"></div>
   </div>
 
-<div id="toast"></div>
+  <div id="toast"></div>
 
   <!-- Print-only invoice layout -->
   <div id="print-sheet" class="print-sheet">
-
     <div class="print-header">
       <div class="print-header-left">
         <img src="img/logo.jpeg" alt="SmiloCAD Logo" class="print-logo">
@@ -168,8 +141,8 @@
       <div class="print-brand">
         <div class="print-brand-name">SmiloCAD Dental Lab</div>
         <div class="print-brand-line">Al Anayat Plaza, G11 Markaz Islamabad</div>
-        <div class="print-brand-line">Phone: </div>
-        <div class="print-brand-line">Email: </div>
+        <div class="print-brand-line">Phone:</div>
+        <div class="print-brand-line">Email:</div>
       </div>
     </div>
 
@@ -194,7 +167,7 @@
         <tr>
           <th class="c">Item</th>
           <th>Patient Name</th>
-          <th>Shield</th>
+          <th>Shade</th>
           <th>Description</th>
           <th class="c">Unit</th>
           <th class="r">Rate</th>
@@ -214,15 +187,14 @@
     </div>
 
     <div class="print-footer">Thank you for your business!</div>
+  </div>
 
-  </div> 
-
-  <script src="js/data.js?v=20260413"></script>
-  <script src="js/db.js?v=20260413"></script>
-  <script src="js/ui.js?v=20260413"></script>
-  <script src="js/rows.js?v=20260413"></script>
-  <script src="js/history.js?v=20260413"></script>
-  <script src="js/app.js?v=20260413"></script>
+  <script src="js/data.js?v=20260418"></script>
+  <script src="js/db.js?v=20260418"></script>
+  <script src="js/ui.js?v=20260418"></script>
+  <script src="js/rows.js?v=20260418"></script>
+  <script src="js/history.js?v=20260418"></script>
+  <script src="js/app.js?v=20260418"></script>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
    js/db.js  —  Live Neon DB Helpers
    ───────────────────────────────────────── */
 
-const API_URL = "https://ahmadyarai-smilocad-invoice-system.hf.space/api/invoices";
+const API_URL = "/api/invoices";
 
 /* No need to "Open" a local DB anymore, but we'll keep the function 
    so app.js doesn't break. We'll just return true. */

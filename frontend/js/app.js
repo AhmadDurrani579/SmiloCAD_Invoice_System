@@ -9,19 +9,31 @@ var App = (function() {
     function _collect() {
         // Safe check for Rows object
         var rowData = (typeof Rows !== 'undefined') ? Rows.collect() : [];
+        var firstRow = {};
+        for (var i = 0; i < rowData.length; i++) {
+            if (rowData[i] && (rowData[i].patient_name || rowData[i].shade || rowData[i].description)) {
+                firstRow = rowData[i];
+                break;
+            }
+        }
         
-        var items = rowData.map(row => ({
-            description: row.description || row.desc || "Service",
-            quantity: parseInt(row.quantity || row.qty) || 1,
-            price_per_unit: parseFloat(row.price_per_unit || row.price) || 0
-        }));
+        var items = rowData.map(function(row) {
+            return {
+                patient_name: row.patient_name || "",
+                shade: row.shade || "",
+                description: row.description || row.desc || "Service",
+                quantity: parseInt(row.quantity || row.qty) || 1,
+                price_per_unit: parseFloat(row.price_per_unit || row.price) || 0,
+                total_price: parseFloat(row.total_price) || 0
+            };
+        });
 
         return {
             date: document.getElementById("inv-date")?.value ? document.getElementById("inv-date").value + "T00:00:00" : new Date().toISOString(),
             doctor_name: document.getElementById("doctor-name")?.value || "",
             clinic_name: document.getElementById("clinic")?.value || "",
-            patient_name: document.getElementById("patient")?.value || "",
-            shade: document.getElementById("shade")?.value || "",
+            patient_name: firstRow.patient_name || document.getElementById("patient")?.value || "",
+            shade: firstRow.shade || document.getElementById("shade")?.value || "",
             received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
             items: items,
             notes: document.getElementById("notes")?.value || ""
@@ -93,9 +105,6 @@ var App = (function() {
         var invDate = document.getElementById("inv-date")?.value || "";
         var doctor = document.getElementById("doctor-name")?.value || "";
         var clinic = document.getElementById("clinic")?.value || "";
-        var patient = document.getElementById("patient")?.value || "";
-        var shade = document.getElementById("shade")?.value || "";
-
         var invNoEl = document.getElementById("print-inv-no");
         var invDateEl = document.getElementById("print-inv-date");
         if (invNoEl) invNoEl.textContent = invNo === "Auto-Generated" ? "INV-0000" : invNo;
@@ -117,8 +126,8 @@ var App = (function() {
             var qty = item ? item.quantity : "";
             var price = item ? item.price_per_unit : "";
             var total = item ? (item.quantity * item.price_per_unit) : "";
-            var rowPatient = item ? (patient || "") : "";
-            var rowShade = item ? (shade || "") : "";
+            var rowPatient = item ? (item.patient_name || "") : "";
+            var rowShade = item ? (item.shade || "") : "";
             var rowHtml = [
                 '<tr>',
                 '<td class="c">', (i + 1), '</td>',
@@ -167,14 +176,10 @@ var App = (function() {
 
             const doctorEl = document.getElementById("doctor-name");
             const clinicEl = document.getElementById("clinic");
-            const patientEl = document.getElementById("patient");
-            const shadeEl = document.getElementById("shade");
             const receivedEl = document.getElementById("received-input");
 
             if (doctorEl) doctorEl.value = inv.doctor_name || "";
             if (clinicEl) clinicEl.value = inv.clinic_name || "";
-            if (patientEl) patientEl.value = inv.patient_name || "";
-            if (shadeEl) shadeEl.value = inv.shade || "";
             if (receivedEl) receivedEl.value = (inv.received_amount || 0);
 
             if (typeof Rows !== 'undefined' && typeof Rows.load === 'function') {

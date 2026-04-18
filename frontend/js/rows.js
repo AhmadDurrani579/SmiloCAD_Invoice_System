@@ -1,153 +1,189 @@
-/* ─────────────────────────────────────────
-   js/rows.js  —  Service row management (Live Version)
-   ───────────────────────────────────────── */
+/* js/rows.js - Service row management */
 
 var Rows = (function() {
-
   var _rowCounter = 0;
 
-  /* Build the <select> options HTML */
+  function _escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function _serviceOptions(selected) {
-    var html = '<option value="">— Select Service —</option>';
+    var html = '<option value="">Select service</option>';
     var services = (typeof SERVICES !== "undefined" && SERVICES) ? SERVICES : [];
-    services.forEach(function(s) {
-      html += '<option' + (s === selected ? ' selected' : '') + '>' + s + '</option>';
+    services.forEach(function(service) {
+      html += '<option' + (service === selected ? ' selected' : '') + '>' + _escapeHtml(service) + '</option>';
     });
     return html;
   }
 
-  /* Create one table row of HTML */
-  function _buildRow(id, desc, qty, price, total) {
-    desc  = desc  || "";
-    qty   = qty   !== undefined ? qty   : 1;
-    price = price !== undefined ? price : "";
-    total = total || 0;
+  function _shadeOptions(selected) {
+    var html = '<option value="">Select shade</option>';
+    var shades = (typeof SHADES !== "undefined" && SHADES) ? SHADES : [];
+    shades.forEach(function(shade) {
+      if (!shade) return;
+      html += '<option' + (shade === selected ? ' selected' : '') + '>' + _escapeHtml(shade) + '</option>';
+    });
+    return html;
+  }
+
+  function _buildRow(id, item) {
+    item = item || {};
+    var patient = item.patient_name || "";
+    var shade = item.shade || "";
+    var desc = item.description || "";
+    var qty = item.quantity !== undefined ? item.quantity : 1;
+    var price = item.price_per_unit !== undefined ? item.price_per_unit : "";
+    var total = qty && price ? (qty * price) : 0;
 
     return [
       '<tr id="row-' + id + '">',
         '<td class="sno row-index"></td>',
-        '<td>',
-          '<select class="tbl-select" onchange="Rows.update(' + id + ')">' + _serviceOptions(desc) + '</select>',
-        '</td>',
-        '<td>',
-          '<input type="number" class="tbl-input" min="1" value="' + qty + '"',
-          ' style="text-align:center" oninput="Rows.update(' + id + ')"/>',
-        '</td>',
-        '<td>',
-          '<input type="number" class="tbl-input right" min="0" value="' + price + '" placeholder="0"',
-          ' oninput="Rows.update(' + id + ')"/>',
-        '</td>',
+        '<td><input type="text" class="tbl-input row-patient" value="' + _escapeHtml(patient) + '" placeholder="Patient name"></td>',
+        '<td><select class="tbl-select row-shade" onchange="Rows.update(' + id + ')">' + _shadeOptions(shade) + '</select></td>',
+        '<td><select class="tbl-select row-desc" onchange="Rows.update(' + id + ')">' + _serviceOptions(desc) + '</select></td>',
+        '<td><input type="number" class="tbl-input row-qty" min="1" value="' + _escapeHtml(qty) + '" style="text-align:center" oninput="Rows.update(' + id + ')"></td>',
+        '<td><input type="number" class="tbl-input right row-price" min="0" value="' + _escapeHtml(price) + '" placeholder="0" oninput="Rows.update(' + id + ')"></td>',
         '<td class="total-cell row-total">' + fmtNum(total) + '</td>',
-        '<td class="action-cell">',
-          '<button class="btn-del" onclick="Rows.remove(' + id + ')">×</button>',
-        '</td>',
-      '</tr>',
+        '<td class="action-cell"><button class="btn-del" onclick="Rows.remove(' + id + ')">x</button></td>',
+      '</tr>'
     ].join("");
   }
 
-  /* Renumber, update, and summary logic (No changes needed here) */
   function _renumber() {
     var cells = document.querySelectorAll("#rows-body .row-index");
-    cells.forEach(function(cell, i) { cell.textContent = i + 1; });
+    cells.forEach(function(cell, i) {
+      cell.textContent = i + 1;
+    });
+  }
+
+  function _rowTotals(row) {
+    var qtyEl = row.querySelector(".row-qty");
+    var priceEl = row.querySelector(".row-price");
+    var qty = parseFloat(qtyEl ? qtyEl.value : 0) || 0;
+    var price = parseFloat(priceEl ? priceEl.value : 0) || 0;
+    return {
+      qty: qty,
+      price: price,
+      total: qty * price
+    };
   }
 
   function update(id) {
     var row = document.getElementById("row-" + id);
     if (!row) return;
-    var inputs = row.querySelectorAll("input[type=number]");
-    var qty    = parseFloat(inputs[0].value) || 0;
-    var price  = parseFloat(inputs[1].value) || 0;
-    var total  = qty * price;
-    row.querySelector(".row-total").textContent = fmtNum(total);
+    row.querySelector(".row-total").textContent = fmtNum(_rowTotals(row).total);
     _recalcSummary();
   }
 
   function _recalcSummary() {
     var subtotal = 0;
     document.querySelectorAll("#rows-body tr").forEach(function(row) {
-      var inputs = row.querySelectorAll("input[type=number]");
-      var qty    = parseFloat(inputs[0] ? inputs[0].value : 0) || 0;
-      var price  = parseFloat(inputs[1] ? inputs[1].value : 0) || 0;
-      subtotal  += qty * price;
+      subtotal += _rowTotals(row).total;
     });
 
-    var received  = parseFloat(document.getElementById("received-input").value) || 0;
+    var receivedEl = document.getElementById("received-input");
+    var received = parseFloat(receivedEl ? receivedEl.value : 0) || 0;
     var remaining = subtotal - received;
 
-    document.getElementById("summary-subtotal").textContent  = fmt(subtotal);
-    document.getElementById("summary-total").textContent     = fmt(subtotal);
-    document.getElementById("summary-remaining").textContent = fmt(remaining);
-    document.getElementById("summary-remaining").style.color = remaining > 0 ? "var(--red)" : "var(--green)";
+    var subtotalEl = document.getElementById("summary-subtotal");
+    var totalEl = document.getElementById("summary-total");
+    var remainingEl = document.getElementById("summary-remaining");
+    if (subtotalEl) subtotalEl.textContent = fmt(subtotal);
+    if (totalEl) totalEl.textContent = fmt(subtotal);
+    if (remainingEl) {
+      remainingEl.textContent = fmt(remaining);
+      remainingEl.style.color = remaining > 0 ? "var(--red)" : "var(--green)";
+    }
   }
 
-  /* ── Collect current row data (UPDATED FOR FASTAPI) ── */
   function collect() {
     var result = [];
     document.querySelectorAll("#rows-body tr").forEach(function(row) {
-      var sel    = row.querySelector("select");
-      var inputs = row.querySelectorAll("input[type=number]");
-      var qty    = parseInt(inputs[0] ? inputs[0].value : 1)  || 1;
-      var price  = parseFloat(inputs[1] ? inputs[1].value : 0)  || 0;
-      
-      var serviceName = sel ? sel.value : "";
-      
-      // We only collect rows that actually have a service selected
-      if (serviceName) {
-        result.push({
-          description:    serviceName,       // Matches Pydantic
-          quantity:       qty,               // Matches Pydantic
-          price_per_unit: price,             // Matches Pydantic
-          total_price:    qty * price        // Optional, backend recalculates anyway
-        });
-      }
+      var patientEl = row.querySelector(".row-patient");
+      var shadeEl = row.querySelector(".row-shade");
+      var descEl = row.querySelector(".row-desc");
+      var totals = _rowTotals(row);
+
+      var description = descEl ? descEl.value : "";
+      if (!description) return;
+
+      result.push({
+        patient_name: patientEl ? patientEl.value : "",
+        shade: shadeEl ? shadeEl.value : "",
+        description: description,
+        quantity: totals.qty || 1,
+        price_per_unit: totals.price || 0,
+        total_price: totals.total
+      });
     });
     return result;
   }
 
-  /* Helper methods */
   function add() {
     var id = ++_rowCounter;
-    document.getElementById("rows-body").insertAdjacentHTML("beforeend", _buildRow(id));
+    document.getElementById("rows-body").insertAdjacentHTML("beforeend", _buildRow(id, {}));
     _renumber();
   }
 
   function remove(id) {
     var row = document.getElementById("row-" + id);
-    if (row) { row.remove(); _renumber(); _recalcSummary(); }
+    if (row) {
+      row.remove();
+      _renumber();
+      _recalcSummary();
+    }
   }
 
   function reset() {
-    document.getElementById("rows-body").innerHTML = "";
-    add(); add();
+    _rowCounter = 0;
+    var body = document.getElementById("rows-body");
+    if (body) body.innerHTML = "";
+    add();
+    add();
   }
 
-  /* Loading from DB (Updated keys) */
   function load(savedItems) {
-    document.getElementById("rows-body").innerHTML = "";
+    _rowCounter = 0;
+    var body = document.getElementById("rows-body");
+    if (body) body.innerHTML = "";
+
     (savedItems || []).forEach(function(item) {
       var id = ++_rowCounter;
-      // Note the mapping: description -> desc, etc.
-      document.getElementById("rows-body")
-              .insertAdjacentHTML("beforeend", _buildRow(
-                  id, 
-                  item.description, 
-                  item.quantity, 
-                  item.price_per_unit, 
-                  (item.quantity * item.price_per_unit)
-              ));
+      body.insertAdjacentHTML("beforeend", _buildRow(id, item));
     });
+
+    if (_rowCounter === 0) {
+      add();
+      add();
+    }
+
     _renumber();
     _recalcSummary();
   }
 
   function subtotal() {
-    return collect().reduce(function(sum, r) { return sum + (r.quantity * r.price_per_unit); }, 0);
+    return collect().reduce(function(sum, row) {
+      return sum + (row.quantity * row.price_per_unit);
+    }, 0);
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("received-input").addEventListener("input", _recalcSummary);
+    var received = document.getElementById("received-input");
+    if (received) received.addEventListener("input", _recalcSummary);
   });
 
-  return { add: add, remove: remove, reset: reset, load: load, collect: collect, subtotal: subtotal, update: update };
-
+  return {
+    add: add,
+    remove: remove,
+    reset: reset,
+    load: load,
+    collect: collect,
+    subtotal: subtotal,
+    update: update
+  };
 })();

@@ -15,6 +15,8 @@ except ImportError:
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
 class ItemCreate(BaseModel):
+    patient_name: str
+    shade: str
     description: str
     quantity: int
     price_per_unit: float
@@ -34,14 +36,17 @@ class InvoiceCreate(BaseModel):
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     # 1. Calculate total
     total = sum(item.quantity * item.price_per_unit for item in data.items)
+    first_item = data.items[0] if data.items else None
+    invoice_patient = data.patient_name or (first_item.patient_name if first_item else "")
+    invoice_shade = data.shade or (first_item.shade if first_item else "")
     
     # 2. Create the invoice object
     new_invoice = Invoice(
         date=data.date or datetime.utcnow(),
         doctor_name=data.doctor_name,
         clinic_name=data.clinic_name,
-        patient_name=data.patient_name,
-        shade=data.shade,
+        patient_name=invoice_patient,
+        shade=invoice_shade,
         total_amount=total,
         received_amount=data.received_amount,
         remaining_balance=total - data.received_amount,
@@ -62,6 +67,8 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     for item in data.items:
         db.add(InvoiceItem(
             invoice_id=new_invoice.id,
+            patient_name=item.patient_name,
+            shade=item.shade,
             description=item.description,
             quantity=item.quantity,
             price_per_unit=item.price_per_unit,
@@ -97,6 +104,8 @@ def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
         "remaining_balance": invoice.remaining_balance,
         "items": [
             {
+                "patient_name": item.patient_name,
+                "shade": item.shade,
                 "description": item.description,
                 "quantity": item.quantity,
                 "price_per_unit": item.price_per_unit,

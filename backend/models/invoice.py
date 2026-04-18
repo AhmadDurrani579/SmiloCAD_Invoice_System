@@ -33,6 +33,8 @@ class InvoiceItem(Base):
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     invoice_id = Column(Integer, ForeignKey("invoices.id"))
+    patient_name = Column(String)
+    shade = Column(String)
     description = Column(String)
     quantity = Column(Integer)
     price_per_unit = Column(Float)
