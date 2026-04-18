@@ -137,7 +137,7 @@ table.svc-table   { width: 100%; min-width: 1120px; border-collapse: collapse; f
 .svc-table th:nth-child(1), .svc-table td:nth-child(1) { width: 42px; }
 .svc-table th:nth-child(2), .svc-table td:nth-child(2) { width: 170px; }
 .svc-table th:nth-child(3), .svc-table td:nth-child(3) { width: 110px; }
-.svc-table th:nth-child(4), .svc-table td:nth-child(4) { width: 170px; }
+.svc-table th:nth-child(4), .svc-table td:nth-child(4) { width: 110px; }
 .svc-table th:nth-child(5), .svc-table td:nth-child(5) { width: 80px; }
 .svc-table th:nth-child(6), .svc-table td:nth-child(6) { width: 130px; }
 .svc-table th:nth-child(7), .svc-table td:nth-child(7) { width: 110px; }
