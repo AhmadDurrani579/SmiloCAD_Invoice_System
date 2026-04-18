@@ -44,7 +44,7 @@ var App = (function() {
             }
 
             // 2. Safe Date Extraction
-            const dateEl = document.getElementById("invoice-date");
+            const dateEl = document.getElementById("inv-date");
             let formattedDate;
             try {
                 // If element exists and has a value, convert to ISO, else use NOW
@@ -58,10 +58,12 @@ var App = (function() {
             // 3. Build the data object with "Optional Chaining" (?.)
             const invoiceData = {
                 doctor_name: document.getElementById("doctor-name")?.value || "Unknown Doctor",
-                clinic_name: document.getElementById("clinic-name")?.value || "Unknown Clinic",
+                clinic_name: document.getElementById("clinic")?.value || "Unknown Clinic",  // ← fixed
                 date: formattedDate,
+                total_amount: parseFloat(document.getElementById("summary-total")?.textContent.replace(/[^0-9.]/g, '')) || 0,  // ← added
                 received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
-                notes: document.getElementById("notes-area")?.value || "",
+                remaining_balance: parseFloat(document.getElementById("summary-remaining")?.textContent.replace(/[^0-9.]/g, '')) || 0,  // ← added
+                notes: document.getElementById("notes")?.value || "",  // ← fixed
                 items: itemsList
             };
 
