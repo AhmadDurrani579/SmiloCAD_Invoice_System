@@ -14,8 +14,6 @@ class Invoice(Base):
     invoice_no = Column(String, nullable=True)
     doctor_name = Column(String)
     clinic_name = Column(String)
-    patient_name = Column(String)
-    shade = Column(String)
     total_amount = Column(Float)
     received_amount = Column(Float)
     remaining_balance = Column(Float)

@@ -44,14 +44,27 @@ var App = (function() {
     async function save() {
         console.log("Save initiated...");
         try {
-            var data = _collect();
-            if (_currentId) data.id = _currentId;
+            // 1. Collect the items (rows)
+            const itemsList = _collect(); 
+            if (itemsList.length === 0) throw new Error("Please add at least one item.");
 
-            // Ensure dbSave exists from db.js
-            if (typeof dbSave !== 'function') throw new Error("dbSave function not found. Check db.js");
+            // 2. Wrap them in the InvoiceCreate structure
+            const invoiceData = {
+                doctor_name: document.getElementById("doctor-name")?.value || "Unknown Doctor",
+                clinic_name: document.getElementById("clinic-name")?.value || "Unknown Clinic",
+                date: document.getElementById("invoice-date")?.value || new Date().toISOString(),
+                received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
+                notes: document.getElementById("notes-area")?.value || "",
+                items: itemsList // This is the result of your _collect()
+            };
 
-            var result = await dbSave(data);
+            // If we are editing an existing invoice
+            if (_currentId) invoiceData.id = _currentId;
+
+            // 3. Send the WRAPPED object to the database
+            var result = await dbSave(invoiceData);
             
+            // 4. Handle response
             if (document.getElementById("inv-number")) {
                 document.getElementById("inv-number").value = result.invoice_no;
             }
@@ -62,10 +75,10 @@ var App = (function() {
             
         } catch (err) {
             console.error("Save Error:", err);
-            if (typeof showToast === 'function') showToast("❌ Save failed. Check console.", "error");
+            if (typeof showToast === 'function') showToast(`❌ Save failed: ${err.message}`, "error");
         }
     }
-
+    
     // ── Public: New/Reset ──
     async function _resetForm() {
         _currentId = null;

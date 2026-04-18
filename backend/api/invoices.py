@@ -15,6 +15,7 @@ except ImportError:
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
 class ItemCreate(BaseModel):
+    # These are now defined for every single row
     patient_name: str
     shade: str
     description: str
@@ -22,53 +23,47 @@ class ItemCreate(BaseModel):
     price_per_unit: float
 
 class InvoiceCreate(BaseModel):
-    date: Optional[datetime] = None # User can select this
+    # General Info (Header)
+    date: Optional[datetime] = None
     doctor_name: str
     clinic_name: str
-    patient_name: str
-    shade: str
-    received_amount: float
+    
+    # Financials & Notes
+    received_amount: float = 0.0
     notes: Optional[str] = None
+    
+    # The list of rows containing the patient info
     items: List[ItemCreate]
-
 
 @router.post("/")
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
-    # 1. Calculate total
-    total = sum(item.quantity * item.price_per_unit for item in data.items)
-    first_item = data.items[0] if data.items else None
-    invoice_patient = data.patient_name or (first_item.patient_name if first_item else "")
-    invoice_shade = data.shade or (first_item.shade if first_item else "")
+    # 1. Calculate the total by summing all items in the list
+    total_amount = sum(item.quantity * item.price_per_unit for item in data.items)
     
-    # 2. Create the invoice object
+    # 2. Create the Main Invoice (The Header)
     new_invoice = Invoice(
         date=data.date or datetime.utcnow(),
         doctor_name=data.doctor_name,
         clinic_name=data.clinic_name,
-        patient_name=invoice_patient,
-        shade=invoice_shade,
-        total_amount=total,
+        total_amount=total_amount,
         received_amount=data.received_amount,
-        remaining_balance=total - data.received_amount,
+        remaining_balance=total_amount - data.received_amount,
         notes=data.notes,
-        invoice_no="TEMP" # This will be overwritten before the commit
+        invoice_no=None # Placeholder for the flush
     )
     
     db.add(new_invoice)
+    db.flush() # Secure the ID from the database
     
-    # --- THE SECRET SAUCE ---
-    db.flush()  # This asks the DB for an ID without committing the record
-    
-    # 3. Now we have new_invoice.id, so we set the real invoice_no
+    # Generate the professional ID (e.g., INV-0042)
     new_invoice.invoice_no = f"INV-{new_invoice.id:04d}"
-    # ------------------------
 
-    # 4. Add the items
+    # 3. Save each row (The Items)
     for item in data.items:
         db.add(InvoiceItem(
             invoice_id=new_invoice.id,
-            patient_name=item.patient_name,
-            shade=item.shade,
+            patient_name=item.patient_name, # Row-specific
+            shade=item.shade,               # Row-specific
             description=item.description,
             quantity=item.quantity,
             price_per_unit=item.price_per_unit,
@@ -76,13 +71,13 @@ def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
         ))
     
     try:
-        db.commit() # Now everything is saved in ONE transaction
+        db.commit()
         db.refresh(new_invoice)
-        return {"status": "success", "invoice_no": new_invoice.invoice_no}
+        return {"status": "success", "invoice_no": new_invoice.invoice_no, "id": new_invoice.id}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
-
+        raise HTTPException(status_code=400, detail=str(e))
+        
 @router.get("/{invoice_id}")
 def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
     # Look for the invoice and include its items
