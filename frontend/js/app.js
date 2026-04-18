@@ -7,39 +7,35 @@ var App = (function() {
 
     // ── Internal Helper: Collect form data ──
     function _collect() {
-        // Safe check for Rows object
+        // 1. Get the rows from your table
         var rowData = (typeof Rows !== 'undefined') ? Rows.collect() : [];
-        var firstRow = {};
-        for (var i = 0; i < rowData.length; i++) {
-            if (rowData[i] && (rowData[i].patient_name || rowData[i].shade || rowData[i].description)) {
-                firstRow = rowData[i];
-                break;
-            }
-        }
         
+        // 2. Map the items correctly (No change needed here, this looks good)
         var items = rowData.map(function(row) {
             return {
                 patient_name: row.patient_name || "",
                 shade: row.shade || "",
                 description: row.description || row.desc || "Service",
                 quantity: parseInt(row.quantity || row.qty) || 1,
-                price_per_unit: parseFloat(row.price_per_unit || row.price) || 0,
-                total_price: parseFloat(row.total_price) || 0
+                price_per_unit: parseFloat(row.price_per_unit || row.price) || 0
+                // total_price is usually calculated by backend, but okay to keep if model allows
             };
         });
 
+        // 3. Return the object exactly as the Pydantic model expects it
         return {
-            date: document.getElementById("inv-date")?.value ? document.getElementById("inv-date").value + "T00:00:00" : new Date().toISOString(),
+            // Fix: Use simple YYYY-MM-DD for the date to avoid the T00:00:00 pattern error
+            date: document.getElementById("inv-date")?.value || new Date().toISOString().split('T')[0],
             doctor_name: document.getElementById("doctor-name")?.value || "",
             clinic_name: document.getElementById("clinic")?.value || "",
-            patient_name: firstRow.patient_name || document.getElementById("patient")?.value || "",
-            shade: firstRow.shade || document.getElementById("shade")?.value || "",
+            
+            // REMOVED: patient_name and shade (They are now inside 'items' only)
+            
             received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
-            items: items,
-            notes: document.getElementById("notes")?.value || ""
+            notes: document.getElementById("notes")?.value || "",
+            items: items 
         }; 
     }
-
     // ── Public: Save to Neon ──
     async function save() {
         console.log("Save initiated...");
