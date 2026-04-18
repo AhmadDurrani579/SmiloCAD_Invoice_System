@@ -136,9 +136,9 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
 .svc-table td.total-cell { text-align: right; font-weight: 700; color: var(--blue-deep); font-size: 0.85rem; padding-right: 6px; white-space: nowrap; }
 .svc-table td.action-cell { text-align: center; }
 .svc-table th:nth-child(1), .svc-table td:nth-child(1) { width: 30px; }
-.svc-table th:nth-child(2), .svc-table td:nth-child(2) { width: 130px; }
-.svc-table th:nth-child(3), .svc-table td:nth-child(3) { width: 90px; }
-.svc-table th:nth-child(4), .svc-table td:nth-child(4) { width: auto; }
+.svc-table th:nth-child(2), .svc-table td:nth-child(2) { width: 120px; }
+.svc-table th:nth-child(3), .svc-table td:nth-child(3) { width: 110px; }
+.svc-table th:nth-child(4), .svc-table td:nth-child(4) { width: 180px; }
 .svc-table th:nth-child(5), .svc-table td:nth-child(5) { width: 50px; }
 .svc-table th:nth-child(6), .svc-table td:nth-child(6) { width: 90px; }
 .svc-table th:nth-child(7), .svc-table td:nth-child(7) { width: 80px; }
