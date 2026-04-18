@@ -37,35 +37,77 @@ var App = (function() {
             received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
             items: items,
             notes: document.getElementById("notes")?.value || ""
-        };
+        }; 
     }
 
     // ── Public: Save to Neon ──
     async function save() {
         console.log("Save initiated...");
         try {
-            var data = _collect();
-            if (_currentId) data.id = _currentId;
-
-            // Ensure dbSave exists from db.js
-            if (typeof dbSave !== 'function') throw new Error("dbSave function not found. Check db.js");
-
-            var result = await dbSave(data);
-            
-            if (document.getElementById("inv-number")) {
-                document.getElementById("inv-number").value = result.invoice_no;
+            // 1. Collect the items (rows)
+            const itemsList = _collect(); 
+            if (!itemsList || itemsList.length === 0) {
+                throw new Error("Please add at least one item.");
             }
+
+            // 2. Safe Date Extraction
+            const dateEl = document.getElementById("invoice-date");
+            let formattedDate;
+            try {
+                // If element exists and has a value, convert to ISO, else use NOW
+                formattedDate = (dateEl && dateEl.value) 
+                    ? new Date(dateEl.value).toISOString() 
+                    : new Date().toISOString();
+            } catch (e) {
+                formattedDate = new Date().toISOString();
+            }
+
+            // 3. Build the data object with "Optional Chaining" (?.)
+            const invoiceData = {
+                doctor_name: document.getElementById("doctor-name")?.value || "Unknown Doctor",
+                clinic_name: document.getElementById("clinic-name")?.value || "Unknown Clinic",
+                date: formattedDate,
+                received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
+                notes: document.getElementById("notes-area")?.value || "",
+                items: itemsList
+            };
+
+            // If we are editing an existing invoice
+            if (typeof _currentId !== 'undefined' && _currentId) {
+                invoiceData.id = _currentId;
+            }
+
+            // 4. Send to Database
+            if (typeof dbSave !== 'function') {
+                throw new Error("Database save function (dbSave) is missing!");
+            }
+
+            const result = await dbSave(invoiceData);
+            
+            // 5. Update UI with result
+            const invNumEl = document.getElementById("inv-number");
+            if (invNumEl) {
+                invNumEl.value = result.invoice_no || "";
+            }
+            
             _currentId = result.id;
 
-            if (typeof showToast === 'function') showToast(`✅ Saved! ${result.invoice_no}`, "success");
-            if (typeof updateHeaderBadge === 'function') updateHeaderBadge();
+            if (typeof showToast === 'function') {
+                showToast(`✅ Saved! ${result.invoice_no}`, "success");
+            }
+            
+            if (typeof updateHeaderBadge === 'function') {
+                updateHeaderBadge();
+            }
             
         } catch (err) {
-            console.error("Save Error:", err);
-            if (typeof showToast === 'function') showToast("❌ Save failed. Check console.", "error");
+            console.error("Detailed Save Error:", err);
+            if (typeof showToast === 'function') {
+                // This will now show the specific error (like "null is not an object")
+                showToast(`❌ Save failed: ${err.message}`, "error");
+            }
         }
     }
-
     // ── Public: New/Reset ──
     async function _resetForm() {
         _currentId = null;
