@@ -34,73 +34,56 @@ var App = (function() {
         }; 
     }
     // ── Public: Save to Neon ──
+
     async function save() {
         console.log("Save initiated...");
         try {
-            // 1. Collect the items (rows)
-            const itemsList = _collect(); 
+            // _collect() returns the full invoice object
+            const collected = _collect();
+            
+            // Extract just the items array
+            const itemsList = collected.items;
             if (!itemsList || itemsList.length === 0) {
                 throw new Error("Please add at least one item.");
             }
 
-            // 2. Safe Date Extraction
             const dateEl = document.getElementById("inv-date");
             let formattedDate;
             try {
-                // If element exists and has a value, convert to ISO, else use NOW
-                formattedDate = (dateEl && dateEl.value) 
-                    ? new Date(dateEl.value).toISOString() 
+                formattedDate = (dateEl && dateEl.value)
+                    ? new Date(dateEl.value).toISOString()
                     : new Date().toISOString();
             } catch (e) {
                 formattedDate = new Date().toISOString();
             }
 
-            // 3. Build the data object with "Optional Chaining" (?.)
             const invoiceData = {
                 doctor_name: document.getElementById("doctor-name")?.value || "Unknown Doctor",
-                clinic_name: document.getElementById("clinic")?.value || "Unknown Clinic",  // ← fixed
+                clinic_name: document.getElementById("clinic")?.value || "Unknown Clinic",
                 date: formattedDate,
-                total_amount: parseFloat(document.getElementById("summary-total")?.textContent.replace(/[^0-9.]/g, '')) || 0,  // ← added
+                total_amount: parseFloat(document.getElementById("summary-total")?.textContent.replace(/[^0-9.]/g, '')) || 0,
                 received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
-                remaining_balance: parseFloat(document.getElementById("summary-remaining")?.textContent.replace(/[^0-9.]/g, '')) || 0,  // ← added
-                notes: document.getElementById("notes")?.value || "",  // ← fixed
-                items: itemsList
+                remaining_balance: parseFloat(document.getElementById("summary-remaining")?.textContent.replace(/[^0-9.]/g, '')) || 0,
+                notes: document.getElementById("notes")?.value || "",
+                items: itemsList  // ← now correctly just the items array
             };
 
-            // If we are editing an existing invoice
-            if (typeof _currentId !== 'undefined' && _currentId) {
-                invoiceData.id = _currentId;
-            }
+            if (_currentId) invoiceData.id = _currentId;
 
-            // 4. Send to Database
-            if (typeof dbSave !== 'function') {
-                throw new Error("Database save function (dbSave) is missing!");
-            }
+            console.log("Sending:", JSON.stringify(invoiceData, null, 2)); // debug
 
             const result = await dbSave(invoiceData);
-            
-            // 5. Update UI with result
+
             const invNumEl = document.getElementById("inv-number");
-            if (invNumEl) {
-                invNumEl.value = result.invoice_no || "";
-            }
-            
+            if (invNumEl) invNumEl.value = result.invoice_no || "";
             _currentId = result.id;
 
-            if (typeof showToast === 'function') {
-                showToast(`✅ Saved! ${result.invoice_no}`, "success");
-            }
-            
-            if (typeof updateHeaderBadge === 'function') {
-                updateHeaderBadge();
-            }
-            
+            if (typeof showToast === 'function') showToast(`✅ Saved! ${result.invoice_no}`, "success");
+            if (typeof updateHeaderBadge === 'function') updateHeaderBadge();
+
         } catch (err) {
             console.error("Detailed Save Error:", err);
-            if (typeof showToast === 'function') {
-                // This will now show the specific error (like "null is not an object")
-                showToast(`❌ Save failed: ${err.message}`, "error");
-            }
+            if (typeof showToast === 'function') showToast(`❌ Save failed: ${err.message}`, "error");
         }
     }
     // ── Public: New/Reset ──
