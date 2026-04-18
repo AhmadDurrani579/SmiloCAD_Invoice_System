@@ -7,10 +7,10 @@ var App = (function() {
 
     // ── Internal Helper: Collect form data ──
     function _collect() {
-        // 1. Get the rows from your table
+    // 1. Get the raw rows from your table component
         var rowData = (typeof Rows !== 'undefined') ? Rows.collect() : [];
         
-        // 2. Map the items correctly (No change needed here, this looks good)
+        // 2. Map items to match your Python ItemCreate schema EXACTLY
         var items = rowData.map(function(row) {
             return {
                 patient_name: row.patient_name || "",
@@ -18,19 +18,16 @@ var App = (function() {
                 description: row.description || row.desc || "Service",
                 quantity: parseInt(row.quantity || row.qty) || 1,
                 price_per_unit: parseFloat(row.price_per_unit || row.price) || 0
-                // total_price is usually calculated by backend, but okay to keep if model allows
             };
         });
 
-        // 3. Return the object exactly as the Pydantic model expects it
+        // 3. Build the Invoice object
+        // IMPORTANT: Remove patient_name and shade from here!
         return {
-            // Fix: Use simple YYYY-MM-DD for the date to avoid the T00:00:00 pattern error
+            // Send ONLY the date string (YYYY-MM-DD), no extra "T00:00:00"
             date: document.getElementById("inv-date")?.value || new Date().toISOString().split('T')[0],
             doctor_name: document.getElementById("doctor-name")?.value || "",
             clinic_name: document.getElementById("clinic")?.value || "",
-            
-            // REMOVED: patient_name and shade (They are now inside 'items' only)
-            
             received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
             notes: document.getElementById("notes")?.value || "",
             items: items 
