@@ -52,7 +52,9 @@ var App = (function() {
             const invoiceData = {
                 doctor_name: document.getElementById("doctor-name")?.value || "Unknown Doctor",
                 clinic_name: document.getElementById("clinic-name")?.value || "Unknown Clinic",
-                date: document.getElementById("invoice-date")?.value || new Date().toISOString(),
+                date: document.getElementById("invoice-date").value 
+                    ? new Date(document.getElementById("invoice-date").value).toISOString() 
+                    : new Date().toISOString(),
                 received_amount: parseFloat(document.getElementById("received-input")?.value) || 0,
                 notes: document.getElementById("notes-area")?.value || "",
                 items: itemsList // This is the result of your _collect()
@@ -78,7 +80,7 @@ var App = (function() {
             if (typeof showToast === 'function') showToast(`❌ Save failed: ${err.message}`, "error");
         }
     }
-    
+
     // ── Public: New/Reset ──
     async function _resetForm() {
         _currentId = null;
