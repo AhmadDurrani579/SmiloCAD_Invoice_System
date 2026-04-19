@@ -2,7 +2,7 @@ const LAB = {
   name: "SmiloCAD Dental Laboratory",
   phone: "0328-9577771",
   address: "Al Anayat Plaza, G11 Markaz Islamabad",
-  tech: "Dt. Sajid",
+  tech: "Dr. Sajid",
 };
 
 const SERVICES = [
