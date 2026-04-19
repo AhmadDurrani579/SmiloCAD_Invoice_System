@@ -19,10 +19,6 @@ Base.metadata.create_all(bind=engine)
 def _ensure_schema():
     inspector = inspect(engine)
     migrations = {
-        "invoices": {
-            "patient_name": "VARCHAR",
-            "shade": "VARCHAR",
-        },
         "invoice_items": {
             "patient_name": "VARCHAR",
             "shade": "VARCHAR",
@@ -37,7 +33,6 @@ def _ensure_schema():
                 if column_name in existing_columns:
                     continue
                 conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}"))
-
 _ensure_schema()
 
 app = FastAPI(title="SmiloCAD API", redirect_slashes=False)
