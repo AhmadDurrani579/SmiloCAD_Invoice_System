@@ -163,12 +163,19 @@ var App = (function() {
         }
 
         var subtotal = (typeof Rows !== 'undefined') ? Rows.subtotal() : 0;
+        var received = parseFloat(document.getElementById("received-input")?.value) || 0;
+        var remaining = subtotal - received;
+
         var subEl = document.getElementById("print-subtotal");
         var totalEl = document.getElementById("print-total");
+        var receivedEl = document.getElementById("print-received");
+        var remainingEl = document.getElementById("print-remaining");
+
         if (subEl) subEl.textContent = _fmtMoney(subtotal);
         if (totalEl) totalEl.textContent = _fmtMoney(subtotal);
+        if (receivedEl) receivedEl.textContent = _fmtMoney(received);
+        if (remainingEl) remainingEl.textContent = _fmtMoney(remaining);
     }
-
     // Empty stubs to prevent "undefined" errors if UI calls them
     function print() { _preparePrint(); window.print(); }
     function downloadPDF() { _preparePrint(); window.print(); }
