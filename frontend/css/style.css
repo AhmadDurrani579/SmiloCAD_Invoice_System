@@ -257,8 +257,8 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 0.5px solid #ddd;
-  background: #f8f8f8;
+  background: #1e5c78;
+  color: #fff;
 }
 .print-header-left {
   display: flex;
@@ -270,21 +270,23 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   height: auto;
   object-fit: contain;
   border-radius: 6px;
+  background: #fff;
+  padding: 4px 8px;
 }
-.print-brand-name { font-weight: 700; font-size: 0.85rem; color: #222; }
-.print-brand-line { font-size: 0.72rem; color: #666; }
+.print-brand-name { font-weight: 700; font-size: 0.85rem; color: #fff; }
+.print-brand-line { font-size: 0.72rem; color: rgba(255,255,255,0.8); }
 .print-header-right { text-align: right; }
 .print-title {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: #1e5c78;
+  color: #fff;
 }
 .print-inv-badge {
   display: inline-block;
   margin-top: 4px;
-  background: #e6f1fb;
-  color: #185fa5;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 3px 12px;
@@ -310,15 +312,15 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   margin: 8px 0 0;
 }
 .print-table thead th {
-  background: #f8f8f8;
-  color: #555;
+  background: #1e5c78;
+  color: #fff;
   padding: 7px 8px;
   text-align: left;
   font-weight: 700;
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border-bottom: 0.5px solid #ccc;
+  border-bottom: none;
 }
 .print-table thead th.c { text-align: center; }
 .print-table thead th.r { text-align: right; }
@@ -356,13 +358,13 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
 
 .print-footer {
   margin: 20px 24px 0;
-  background: #f8f8f8;
-  color: #555;
+  background: #1e5c78;
+  color: #fff;
   text-align: center;
   padding: 10px 12px;
   font-size: 0.75rem;
   font-weight: 600;
-  border-top: 0.5px solid #ddd;
+  border-top: none;
 }
 
 @media print {
