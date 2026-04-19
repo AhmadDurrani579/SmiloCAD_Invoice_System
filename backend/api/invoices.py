@@ -35,6 +35,14 @@ class InvoiceCreate(BaseModel):
     # The list of rows containing the patient info
     items: List[ItemCreate]
 
+class InvoiceUpdate(BaseModel):
+    date: Optional[datetime] = None
+    doctor_name: str
+    clinic_name: str
+    received_amount: float = 0.0
+    notes: Optional[str] = None
+    items: List[ItemCreate]
+
 @router.post("/")
 def create_invoice(data: InvoiceCreate, db: Session = Depends(get_db)):
     # 1. Calculate the total by summing all items in the list
@@ -130,3 +138,41 @@ def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
     db.delete(db_invoice)
     db.commit()
     return {"message": "Deleted successfully"}
+
+
+@router.put("/{invoice_id}")
+def update_invoice(invoice_id: int, data: InvoiceUpdate, db: Session = Depends(get_db)):
+    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    total_amount = sum(item.quantity * item.price_per_unit for item in data.items)
+
+    invoice.date = data.date or datetime.utcnow()
+    invoice.doctor_name = data.doctor_name
+    invoice.clinic_name = data.clinic_name
+    invoice.total_amount = total_amount
+    invoice.received_amount = data.received_amount
+    invoice.remaining_balance = total_amount - data.received_amount
+    invoice.notes = data.notes
+
+    # Delete old items and replace with new ones
+    db.query(InvoiceItem).filter(InvoiceItem.invoice_id == invoice_id).delete()
+    for item in data.items:
+        db.add(InvoiceItem(
+            invoice_id=invoice.id,
+            patient_name=item.patient_name,
+            shade=item.shade,
+            description=item.description,
+            quantity=item.quantity,
+            price_per_unit=item.price_per_unit,
+            total_price=item.quantity * item.price_per_unit
+        ))
+
+    try:
+        db.commit()
+        db.refresh(invoice)
+        return {"status": "success", "invoice_no": invoice.invoice_no, "id": invoice.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))

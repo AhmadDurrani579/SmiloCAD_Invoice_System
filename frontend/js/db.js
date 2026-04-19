@@ -14,17 +14,19 @@ async function dbOpen() {
 /* Save one invoice record to Neon */
 async function dbSave(data) {
     try {
-        const response = await fetch(`${API_URL}/`, {  // ← trailing slash added
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const isUpdate = data.id && data.id !== null;
+        const url = isUpdate ? `${API_URL}/${data.id}` : `${API_URL}/`;
+        const method = isUpdate ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.detail || "Failed to save to Neon");
+            throw new Error(error.detail || "Failed to save");
         }
 
         return await response.json();

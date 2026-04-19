@@ -22,13 +22,11 @@ var History = (function() {
       '<div class="hist-item">',
         '<div class="hist-inv-no">' + (inv.invoice_no || "—") + '</div>',
         '<div>',
-          '<div class="hist-client-name">' + (inv.doctor_name || "Unknown Doctor") + '</div>',
-          '<div class="hist-date">📅 ' + (inv.date ? inv.date.split('T')[0] : "—") + ' &nbsp;·&nbsp; ' + (inv.clinic_name || "—") + '</div>',
+          '<div class="hist-client-name">Dr. ' + (inv.doctor_name || "Unknown Doctor") + '</div>',
+          '<div class="hist-date">📅 ' + (inv.date ? inv.date.split('T')[0] : "—") + ' &nbsp;·&nbsp; Clinic: ' + (inv.clinic_name || "—") + '</div>',
         '</div>',
         '<div>',
-          '<div class="hist-detail">Patient: <span>' + (inv.patient_name || "—") + '</span></div>',
-          // Show the note preview here
-          notePreview, 
+          notePreview,
         '</div>',
         '<div>',
           '<div class="hist-amount">' + _fmt(inv.total_amount || 0) + '</div>',
@@ -63,8 +61,7 @@ var History = (function() {
       return (
         (inv.invoice_no  || "").toLowerCase().includes(q) ||
         (inv.doctor_name || "").toLowerCase().includes(q) ||
-        (inv.clinic_name || "").toLowerCase().includes(q) ||
-        (inv.patient_name|| "").toLowerCase().includes(q)
+        (inv.clinic_name || "").toLowerCase().includes(q)
       );
     });
     _render(filtered);
