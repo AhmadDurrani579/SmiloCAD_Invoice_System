@@ -92,8 +92,6 @@ def get_invoice(invoice_id: int, db: Session = Depends(get_db)):
         "date": invoice.date,
         "doctor_name": invoice.doctor_name,
         "clinic_name": invoice.clinic_name,
-        "patient_name": invoice.patient_name,
-        "shade": invoice.shade,
         "total_amount": invoice.total_amount,
         "received_amount": invoice.received_amount,
         "remaining_balance": invoice.remaining_balance,
