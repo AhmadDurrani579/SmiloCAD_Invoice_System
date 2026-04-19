@@ -251,92 +251,118 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
 /* ─── PRINT ─── */
 .print-sheet { display: none !important; max-width: 820px; margin: 0 auto; font-family: 'Nunito', sans-serif; color: #222; }
 .print-sheet, .print-sheet * { box-sizing: border-box; }
+
 .print-header {
-  background: #1e5c78;
-  color: #fff;
-  padding: 22px 26px;
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 0.5px solid #ddd;
+  background: #f8f8f8;
 }
-
 .print-header-left {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
 }
-
 .print-logo {
   width: 200px;
   height: auto;
   object-fit: contain;
-  background: #fff;
   border-radius: 6px;
-  padding: 4px 8px;
+}
+.print-brand-name { font-weight: 700; font-size: 0.85rem; color: #222; }
+.print-brand-line { font-size: 0.72rem; color: #666; }
+.print-header-right { text-align: right; }
+.print-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #1e5c78;
+}
+.print-inv-badge {
+  display: inline-block;
+  margin-top: 4px;
+  background: #e6f1fb;
+  color: #185fa5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
 }
 
-.print-title {
-  font-size: 2.1rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-.print-brand { text-align: right; font-size: 0.75rem; line-height: 1.45; }
-.print-brand-name { font-weight: 700; font-size: 0.8rem; margin-bottom: 2px; }
 .print-info {
-  padding: 18px 26px 8px;
+  padding: 16px 24px 8px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   font-size: 0.76rem;
 }
-.print-info-title { font-weight: 700; margin-bottom: 6px; }
-.print-info-row { display: flex; gap: 8px; margin: 2px 0; }
-.print-info-row .k { width: 120px; font-weight: 600; color: #333; }
-.print-info-row .v { color: #333; }
+.print-info-title { font-weight: 700; margin-bottom: 6px; color: #222; }
+.print-info-row { display: flex; gap: 8px; margin: 3px 0; }
+.print-info-row .k { width: 110px; font-weight: 600; color: #555; }
+.print-info-row .v { color: #222; }
 
 .print-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.75rem;
-  margin: 6px 0 0;
+  margin: 8px 0 0;
 }
 .print-table thead th {
-  background: #1e5c78;
-  color: #fff;
-  padding: 6px 8px;
+  background: #f8f8f8;
+  color: #555;
+  padding: 7px 8px;
   text-align: left;
   font-weight: 700;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 0.5px solid #ccc;
 }
 .print-table thead th.c { text-align: center; }
 .print-table thead th.r { text-align: right; }
 .print-table tbody td {
   padding: 6px 8px;
-  border-bottom: 1px solid #d7e1e8;
+  border-bottom: 0.5px solid #eee;
+  color: #222;
 }
 .print-table tbody td.c { text-align: center; }
 .print-table tbody td.r { text-align: right; }
 
 .print-summary {
-  padding: 10px 26px 0;
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 24px;
+  padding: 10px 24px 0;
+  display: flex;
+  justify-content: flex-end;
   font-size: 0.75rem;
 }
-.print-terms { color: #333; }
-.print-totals { display: grid; gap: 6px; }
-.tot-row { display: flex; justify-content: space-between; }
-.tot-row.total { border-top: 2px solid #7a2a2a; padding-top: 6px; font-weight: 700; }
+.print-totals { width: 240px; }
+.tot-row { display: flex; justify-content: space-between; padding: 3px 0; color: #555; }
+.tot-row.total {
+  border-top: 0.5px solid #ccc;
+  padding-top: 6px;
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #222;
+}
+.tot-row.remaining-due {
+  border-top: 1.5px dashed #f09595;
+  padding-top: 6px;
+  margin-top: 4px;
+  font-weight: 700;
+  color: #a32d2d;
+}
 
 .print-footer {
-  margin: 22px 26px 0;
-  background: #1e5c78;
-  color: #fff;
+  margin: 20px 24px 0;
+  background: #f8f8f8;
+  color: #555;
   text-align: center;
   padding: 10px 12px;
   font-size: 0.75rem;
   font-weight: 600;
+  border-top: 0.5px solid #ddd;
 }
 
 @media print {
@@ -344,7 +370,6 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   .topbar, .action-bar, .btn-del, .add-row-btn, #toast, #page-history, #page-invoice { display: none !important; }
   .app-body { padding: 0 !important; max-width: none !important; }
   .print-sheet { display: block !important; }
-  .print-header, .print-table thead th, .print-footer,
   .print-logo {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

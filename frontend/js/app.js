@@ -127,8 +127,11 @@ var App = (function() {
         var clinic = document.getElementById("clinic")?.value || "";
         var invNoEl = document.getElementById("print-inv-no");
         var invDateEl = document.getElementById("print-inv-date");
+        var invBadgeEl = document.getElementById("print-inv-badge");
+
         if (invNoEl) invNoEl.textContent = invNo === "Auto-Generated" ? "INV-0000" : invNo;
         if (invDateEl) invDateEl.textContent = invDate || "Enter Date Here";
+        if (invBadgeEl) invBadgeEl.textContent = invNo === "Auto-Generated" ? "INV-0000" : invNo;
 
         var clientEl = document.getElementById("print-client-name");
         var companyEl = document.getElementById("print-company-name");
