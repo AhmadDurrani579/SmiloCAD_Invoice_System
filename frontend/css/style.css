@@ -372,12 +372,14 @@ table.svc-table   { width: 100%; border-collapse: collapse; font-size: 0.84rem; 
   .topbar, .action-bar, .btn-del, .add-row-btn, #toast, #page-history, #page-invoice { display: none !important; }
   .app-body { padding: 0 !important; max-width: none !important; }
   .print-sheet { display: block !important; }
-  .print-logo {
+  .print-logo,
+  .print-header,
+  .print-table thead th,
+  .print-footer {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 }
-
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .app-body { padding: 1rem; }
