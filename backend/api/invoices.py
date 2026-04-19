@@ -116,7 +116,6 @@ def get_all_invoices(db: Session = Depends(get_db)):
         "invoice_no": inv.invoice_number,
         "doctor_name": inv.doctor_name,
         "clinic_name": inv.clinic_name,
-        "patient_name": inv.patient_name,
         "total_amount": inv.total_amount,
         "received_amount": inv.received_amount,
         "date": inv.date
